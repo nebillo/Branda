@@ -1,0 +1,11 @@
+application: brandaproject
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /.*
+  script: frontend/frontend.py
+
+skip_files:
+- ^(.*/)?\.tmproj.*

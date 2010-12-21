@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Grafo{% end %}
+
+{% block body %}
+
+  facebook app id: {{ options.facebook_app_id }}<br>
+  facebook id: {{ current_user.facebook_id }}<br>
+  first login: {{ locale.format_date(current_user.created_at) }}<br>
+  identifier: {{ str(current_user.key()) }}<br>
+  
+{% end %}

@@ -1,0 +1,6 @@
+# textmate
+*.tmproj
+
+.svn
+.DS_Store
+*.pyc
