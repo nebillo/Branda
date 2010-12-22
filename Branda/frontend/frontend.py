@@ -23,7 +23,6 @@ def main():
         "xsrf_cookies": True,
         "cookie_secret": "32oETzXXAAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
         "template_path": os.path.join(os.path.dirname(__file__), "templates"),
-        "static_path": os.path.join(os.path.dirname(__file__), "static"),
     }
     application = tornado.wsgi.WSGIApplication([
         (r"/", MainHandler),
