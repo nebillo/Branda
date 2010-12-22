@@ -36,7 +36,9 @@ usage of this module might look like this:
 import cgi
 import hashlib
 import time
-import urllib
+import urllib, urllib2
+urllib.getproxies_macosx_sysconf = lambda: {}
+urllib2.getproxies_macosx_sysconf = lambda: {}
 
 # Find a JSON parser
 try:
@@ -50,7 +52,7 @@ except ImportError:
         # For Google AppEngine
         from django.utils import simplejson
         _parse_json = lambda s: simplejson.loads(s)
-
+        
 
 class GraphAPI(object):
     """A client for the Facebook Graph API.
@@ -168,8 +170,8 @@ class GraphAPI(object):
             else:
                 args["access_token"] = self.access_token
         post_data = None if post_args is None else urllib.urlencode(post_args)
-        file = urllib.urlopen("https://graph.facebook.com/" + path + "?" +
-                              urllib.urlencode(args), post_data)
+        file = urllib2.urlopen("https://graph.facebook.com/" + path + "?" +
+                               urllib.urlencode(args), post_data)
         try:
             response = _parse_json(file.read())
         finally:
