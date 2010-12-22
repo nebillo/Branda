@@ -20,7 +20,7 @@
     }());
   </script>
   
-  <fb:login-button perms="email,offline_access,user_birthday"></fb:login-button><br />
+  <fb:login-button perms="{{ options.facebook_permissions }}"></fb:login-button><br />
   to find what you like around you.
   
 {% end %}

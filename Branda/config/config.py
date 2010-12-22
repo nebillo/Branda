@@ -7,3 +7,6 @@ if os.environ['SERVER_SOFTWARE'].startswith('Dev'):
 else:
     # production
     from config_prod import *
+
+define("facebook_permissions", help="facebook permissions",
+       default="email,offline_access,user_birthday,user_religion_politics,user_location")
