@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+{% if "info" in things_to_update %}
+<!-- upadate info -->
+{% end %}
+
+{% if "likes" in things_to_update %}
+<!-- upadate likes -->
+{% end %}
+
+{% if "events" in things_to_update %}
+<!-- upadate events -->
+{% end %}
+
+{% if "places" in things_to_update %}
+<!-- upadate places -->
+{% end %}
+
+{% end %}
+
+
+{% block body %}
+
+<p id="wait">updating your things...</p>
+  
+{% end %}

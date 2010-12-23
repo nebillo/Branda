@@ -7,17 +7,17 @@ class GraphHandler(BaseHandler):
     def get(self):
         user = self.get_current_user()
         
-        if user.isFirstLaunch():
-            # get info from facebook
-            graph_api = GraphAPI(user.facebook_access_token)
-            user_info = graph_api.get_object("/me")
-            if not user_info:
-                raise tornado.web.HTTPError(400)
-            # update user with info
-            user.updateWithDictionary(user_info)
-            
-        self.render(
-            "graph.html", 
-            options = options, 
-            title = "Grafo",
-            needs_to_update_info = user.needsToUpdateInfo())
+        things_to_update = set([])
+        if user.needsInfoUpdate():
+            things_to_update.add('info')
+        if user.needsLikesUpdate():
+            things_to_update.add('likes')
+        if user.needsEventsUpdate():
+            things_to_update.add('events')
+        if user.needsPlacesUpdate():
+            things_to_update.add('places')
+        
+        if len(things_to_update) > 0:
+            self.render("graph-update.html", options = options, things_to_update = things_to_update, title = "Updating")
+        else:
+            self.render("graph.html", options = options, title = "Grafo")
