@@ -9,4 +9,4 @@ else:
     from config_prod import *
 
 define("facebook_permissions", help="facebook permissions",
-       default="email,offline_access,user_birthday,user_religion_politics,user_location")
+       default="user_birthday,user_religion_politics,user_likes,user_checkins,user_events")
