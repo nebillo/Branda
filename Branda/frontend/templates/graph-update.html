@@ -1,28 +1,72 @@
 {% extends "base.html" %}
 
 {% block head %}
-
-{% if "info" in things_to_update %}
-<!-- upadate info -->
-{% end %}
-
-{% if "likes" in things_to_update %}
-<!-- upadate likes -->
-{% end %}
-
-{% if "events" in things_to_update %}
-<!-- upadate events -->
-{% end %}
-
-{% if "places" in things_to_update %}
-<!-- upadate places -->
-{% end %}
-
 {% end %}
 
 
 {% block body %}
 
-<p id="wait">updating your things...</p>
+  <p id="wait">updating your things...</p>
+  
+  <div id="fb-root"></div>
+  <script>
+    
+    var response = [];
+    var requests = {{ len(things_to_update) }};
+    
+    function saveResponse(key, value) {
+      console.log(value);
+      response[key] = value;
+      requests --;
+      if (requests <= 0) {
+        alert("I'm ready my lord");
+      }
+    }
+    
+    function updateThings() {
+      
+      {% if "info" in things_to_update %}
+        <!-- upadate info -->
+        FB.api('/me', function(response) {
+          saveResponse("info", response);
+        });
+      {% end %}
+
+      {% if "likes" in things_to_update %}
+        <!-- upadate likes -->
+        FB.api('/me/likes', function(response) {
+          saveResponse("likes", response);
+        });
+      {% end %}
+
+      {% if "events" in things_to_update %}
+        <!-- upadate events -->
+        FB.api('/me/events', function(response) {
+          saveResponse("events", response);
+        });
+      {% end %}
+
+      {% if "places" in things_to_update %}
+        <!-- upadate places -->
+        FB.api('/me/checkins', function(response) {
+          saveResponse("places", response);
+        });
+      {% end %}
+    }
+    
+    window.fbAsyncInit = function() {
+      FB.init({appId: '{{ options.facebook_app_id }}', status: true, cookie: true, xfbml: true});
+      updateThings();
+    };
+    
+    (function() {
+      var e = document.createElement('script');
+      e.type = 'text/javascript';
+      e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+      e.async = true;
+      document.getElementById('fb-root').appendChild(e);
+    }());
+      
+  </script>
   
 {% end %}
