@@ -25,7 +25,15 @@ import email.utils
 import errno
 import httplib
 import logging
-import pycurl
+import os
+try:
+    import pycurl
+except ImportError:
+    # See the other check for this variable at end of file
+    if os.environ.get('USE_SIMPLE_HTTPCLIENT'):
+        pycurl = None
+    else:
+        raise
 import sys
 import threading
 import time
@@ -172,7 +180,7 @@ class AsyncHTTPClient(object):
 
         If an error occurs during the fetch, the HTTPResponse given to the
         callback has a non-None error attribute that contains the exception
-        encountered during the request. You can call response.reraise() to
+        encountered during the request. You can call response.rethrow() to
         throw the exception (if any) in the callback.
         """
         if not isinstance(request, HTTPRequest):
@@ -222,7 +230,7 @@ class AsyncHTTPClient(object):
             try:
                 ret, num_handles = self._socket_action(fd, action)
             except pycurl.error, e:
-                ret = e[0]
+                ret = e.args[0]
             if ret != pycurl.E_CALL_MULTI_PERFORM:
                 break
         self._finish_pending_requests()
@@ -236,7 +244,7 @@ class AsyncHTTPClient(object):
                     ret, num_handles = self._socket_action(
                         pycurl.SOCKET_TIMEOUT, 0)
                 except pycurl.error, e:
-                    ret = e[0]
+                    ret = e.args[0]
                 if ret != pycurl.E_CALL_MULTI_PERFORM:
                     break
             self._finish_pending_requests()
@@ -267,7 +275,7 @@ class AsyncHTTPClient(object):
                 try:
                     ret, num_handles = self._multi.socket_all()
                 except pycurl.error, e:
-                    ret = e[0]
+                    ret = e.args[0]
                 if ret != pycurl.E_CALL_MULTI_PERFORM:
                     break
             self._finish_pending_requests()
@@ -350,8 +358,11 @@ class AsyncHTTPClient(object):
         except (KeyboardInterrupt, SystemExit):
             raise
         except:
-            logging.error("Exception in callback %r", info["callback"],
-                          exc_info=True)
+            self.handle_callback_exception(info["callback"])
+
+
+    def handle_callback_exception(self, callback):
+        self.io_loop.handle_callback_exception(callback)
 
 # For backwards compatibility: Tornado 1.0 included a new implementation of
 # AsyncHTTPClient that has since replaced the original.  Define an alias
@@ -543,6 +554,8 @@ def _curl_setup_request(curl, request, buffer, headers):
             credentials = '%s:%s' % (request.proxy_username,
                     request.proxy_password)
             curl.setopt(pycurl.PROXYUSERPWD, credentials)
+    else:
+        curl.setopt(pycurl.PROXY, '')
 
     # Set the request method through curl's retarded interface which makes
     # up names for almost every single method
@@ -648,6 +661,14 @@ def main():
             print response.headers
         if options.print_body:
             print response.body
+
+# If the environment variable USE_SIMPLE_HTTPCLIENT is set to a non-empty
+# string, use SimpleAsyncHTTPClient instead of AsyncHTTPClient.
+# This is provided as a convenience for testing SimpleAsyncHTTPClient,
+# and may be removed or replaced with a better way of specifying the preferred
+# HTTPClient implementation before the next release.
+if os.environ.get('USE_SIMPLE_HTTPCLIENT'):
+    from tornado.simple_httpclient import SimpleAsyncHTTPClient as AsyncHTTPClient
 
 if __name__ == "__main__":
     main()
