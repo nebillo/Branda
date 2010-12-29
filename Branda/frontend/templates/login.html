@@ -4,9 +4,20 @@
 
   <div id="fb-root"></div>
   <script>
+  
     window.fbAsyncInit = function() {
-      FB.init({appId: '{{ options.facebook_app_id }}', status: true,
-               cookie: true, xfbml: true});
+      FB.init({
+        appId: '{{ options.facebook_app_id }}', 
+        status: true,
+        cookie: true, 
+        xfbml: true
+      });
+      
+      FB.getLoginStatus(function(response) {
+        if (response.session && response.perms) {
+          window.location = "/auth?redirect=1";
+        }
+      }, true);
       FB.Event.subscribe('auth.login', function(response) {
         window.location = "/auth?redirect=1";
       });
