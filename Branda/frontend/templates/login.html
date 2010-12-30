@@ -15,10 +15,15 @@
       
       FB.getLoginStatus(function(response) {
         if (response.session && response.perms) {
+          // session is valid
           window.location = "/auth?redirect=1";
+        } else {
+          // show login button
+          document.getElementById("login").style.visibility = "visible";
         }
       }, true);
       FB.Event.subscribe('auth.login', function(response) {
+        // logged
         window.location = "/auth?redirect=1";
       });
     };
@@ -31,7 +36,9 @@
     }());
   </script>
   
-  <fb:login-button perms="{{ options.facebook_permissions }}"></fb:login-button><br />
-  to find what you like around you.
+  <div id="login" style="visibility:hidden">
+    <fb:login-button perms="{{ options.facebook_permissions }}"></fb:login-button><br />
+    to find what you like around you.
+  <div>
   
 {% end %}
