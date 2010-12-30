@@ -15,11 +15,11 @@
     var requests = {{ len(things_to_update) }};
     
     function saveResponse(key, value) {
-      console.log(value);
       response[key] = value;
       requests --;
       if (requests <= 0) {
-        alert("I'm ready my lord");
+        console.log(response);
+        alert("facebook data logged on your console.");
       }
     }
     
@@ -56,7 +56,15 @@
     
     window.fbAsyncInit = function() {
       FB.init({appId: '{{ options.facebook_app_id }}', status: true, cookie: true, xfbml: true});
-      updateThings();
+      FB.getLoginStatus(function(response) {
+        if (response.session && response.perms) {
+          // user authentication is valid
+          updateThings();
+        } else {
+          // user is not authenticated anymore
+          window.location = "/logout";
+        }
+      }, true);
     };
     
     (function() {
