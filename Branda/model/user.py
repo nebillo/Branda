@@ -7,6 +7,7 @@ class BAUser(db.Model):
     facebook_id = db.StringProperty(required = True)
     facebook_access_token = db.StringProperty(required = True)
     created_at = db.DateTimeProperty(required = True)
+    updated_at = db.DateTimeProperty()
     
     # info
     name = db.StringProperty()
@@ -19,51 +20,17 @@ class BAUser(db.Model):
     religion = db.StringProperty()
     political = db.StringProperty()
     locale = db.StringProperty()
-    info_updated_at = db.DateTimeProperty()
     
     # likes
-    likes_updated_at = db.DateTimeProperty()
     
     # events
-    events_updated_at = db.DateTimeProperty()
     
     # places
-    places_updated_at = db.DateTimeProperty()
-    
     
     def needsUpdate(self):
-        if self.needsInfoUpdate():
+        if not self.updated_at:
             return True
-        if self.needsLikesUpdate():
-            return True
-        if self.needsEventsUpdate():
-            return True
-        if self.needsPlacesUpdate():
-            return True
-        return False
-         
-    def needsInfoUpdate(self):
-        if not self.info_updated_at:
-            return True
-        # check info_updated_at
-        return False
-    
-    def needsLikesUpdate(self):
-        if not self.likes_updated_at:
-            return True
-        # check likes_updated_at
-        return False
-    
-    def needsEventsUpdate(self):
-        if not self.events_updated_at:
-            return True
-        # check events_updated_at
-        return False
-    
-    def needsPlacesUpdate(self):
-        if not self.places_updated_at:
-            return True
-        # check places_updated_at
+        # check updated_at
         return False
        
      
@@ -79,27 +46,23 @@ class BAUser(db.Model):
             self.religion = values["religion"]
         self.locale = values["locale"]
         
-        self.info_updated_at = datetime.datetime.now()
         self.put()
     
         
     def updateLikes(self, likes):
         #TOOD: implement
         
-        self.likes_updated_at = datetime.datetime.now()
         self.put()
         
           
     def updateEvents(self, events):
         #TOOD: implement
         
-        self.events_updated_at = datetime.datetime.now()
         self.put()
     
     
     def updatePlaces(self, places):
         #TOOD: implement
         
-        self.places_updated_at = datetime.datetime.now()
         self.put()
         

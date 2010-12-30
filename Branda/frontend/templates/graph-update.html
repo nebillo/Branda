@@ -15,7 +15,7 @@
   <script src="/js/json.js"></script>
   <script>
     
-    var requests = {{ len(things_to_update) }};
+    var pending_requests = 4;
     
     function saveResponse(key, value) {
       form = document.getElementById("data");
@@ -26,41 +26,33 @@
       field.setAttribute("value", value.toJSONString());
       form.appendChild(field);
       
-      requests --;
-      if (requests <= 0) {
+      pending_requests --;
+      if (pending_requests <= 0) {
         form.submit();
       }
     }
     
     function updateThings() {
       
-      {% if "info" in things_to_update %}
-        <!-- upadate info -->
-        FB.api('/me', function(response) {
-          saveResponse("info", response);
-        });
-      {% end %}
+      <!-- upadate info -->
+      FB.api('/me', function(response) {
+        saveResponse("info", response);
+      });
 
-      {% if "likes" in things_to_update %}
-        <!-- upadate likes -->
-        FB.api('/me/likes', function(response) {
-          saveResponse("likes", response.data);
-        });
-      {% end %}
+      <!-- upadate likes -->
+      FB.api('/me/likes', function(response) {
+        saveResponse("likes", response.data);
+      });
 
-      {% if "events" in things_to_update %}
-        <!-- upadate events -->
-        FB.api('/me/events', function(response) {
-          saveResponse("events", response.data);
-        });
-      {% end %}
+      <!-- upadate events -->
+      FB.api('/me/events', function(response) {
+        saveResponse("events", response.data);
+      });
 
-      {% if "places" in things_to_update %}
-        <!-- upadate places -->
-        FB.api('/me/checkins', function(response) {
-          saveResponse("places", response.data);
-        });
-      {% end %}
+      <!-- upadate places -->
+      FB.api('/me/checkins', function(response) {
+        saveResponse("places", response.data);
+      });
     }
     
     window.fbAsyncInit = function() {
