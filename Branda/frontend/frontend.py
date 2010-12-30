@@ -11,7 +11,7 @@ import os.path
 
 from config.config import *
 from frontend.handlers.main import MainHandler
-from frontend.handlers.auth import AuthHandler, LoginHandler
+from frontend.handlers.auth import AuthHandler, LoginHandler, LogoutHandler
 from frontend.handlers.graph import GraphHandler
 
        
@@ -27,6 +27,7 @@ def main():
     application = tornado.wsgi.WSGIApplication([
         (r"/", MainHandler),
         (r"/login.*", LoginHandler),
+        (r"/logout.*", LogoutHandler),
         (r"/auth.*", AuthHandler),
         (r"/graph.*", GraphHandler),
     ], **settings)

@@ -5,6 +5,12 @@ class LoginHandler(BaseHandler):
     def get(self):
         self.render("login.html", options = options, title = "Login")
 
+class LogoutHandler(BaseHandler):
+    def get(self):
+        #remove cookies
+        self.clear_all_cookies()
+        self.redirect("/")
+
 class AuthHandler(BaseHandler):
     def get(self):
         fb_cookie = self.get_facebook_cookie()
