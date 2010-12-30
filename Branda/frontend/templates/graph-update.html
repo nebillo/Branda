@@ -33,6 +33,7 @@
     }
     
     function updateThings() {
+      var updated_at = {{ current_user.updatedAtInUnixFormat() }};
       
       <!-- upadate info -->
       FB.api('/me', function(response) {
@@ -40,17 +41,17 @@
       });
 
       <!-- upadate likes -->
-      FB.api('/me/likes', function(response) {
+      FB.api('/me/likes', { 'since': updated_at, 'fields': 'name,picture,category' }, function(response) {
         saveResponse("likes", response.data);
       });
 
       <!-- upadate events -->
-      FB.api('/me/events', function(response) {
+      FB.api('/me/events', { 'since': updated_at, 'fields': 'name,start_time,end_time,location,venue,privacy,picture' }, function(response) {
         saveResponse("events", response.data);
       });
 
       <!-- upadate places -->
-      FB.api('/me/checkins', function(response) {
+      FB.api('/me/checkins', { 'since': updated_at }, function(response) {
         saveResponse("places", response.data);
       });
     }

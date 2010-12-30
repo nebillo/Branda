@@ -1,5 +1,6 @@
 from google.appengine.ext import db
 import datetime
+import time
 
 
 class BAUser(db.Model):
@@ -26,6 +27,12 @@ class BAUser(db.Model):
     # events
     
     # places
+    
+    def updatedAtInUnixFormat(self):
+        if not self.updated_at:
+            return 0.0
+        return time.mktime(self.updated_at.timetuple())
+    
     
     def needsUpdate(self):
         if not self.updated_at:
