@@ -7,19 +7,28 @@
 {% block body %}
 
   <p id="wait">updating your things...</p>
+  <form id="data" action="/graph" method="post">
+    {{ xsrf_form_html() }}
+  </form>
   
   <div id="fb-root"></div>
+  <script src="/js/json.js"></script>
   <script>
     
-    var response = {};
     var requests = {{ len(things_to_update) }};
     
     function saveResponse(key, value) {
-      response[key] = value;
+      form = document.getElementById("data");
+      field = document.createElement("input");
+      field.setAttribute("type", "hidden");
+      field.setAttribute("name", key);
+      
+      field.setAttribute("value", value.toJSONString());
+      form.appendChild(field);
+      
       requests --;
       if (requests <= 0) {
-        console.log(response);
-        alert("facebook data logged on your console.");
+        form.submit();
       }
     }
     
