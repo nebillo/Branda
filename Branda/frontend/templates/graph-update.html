@@ -11,7 +11,7 @@
   <div id="fb-root"></div>
   <script>
     
-    var response = [];
+    var response = {};
     var requests = {{ len(things_to_update) }};
     
     function saveResponse(key, value) {
@@ -35,21 +35,21 @@
       {% if "likes" in things_to_update %}
         <!-- upadate likes -->
         FB.api('/me/likes', function(response) {
-          saveResponse("likes", response);
+          saveResponse("likes", response.data);
         });
       {% end %}
 
       {% if "events" in things_to_update %}
         <!-- upadate events -->
         FB.api('/me/events', function(response) {
-          saveResponse("events", response);
+          saveResponse("events", response.data);
         });
       {% end %}
 
       {% if "places" in things_to_update %}
         <!-- upadate places -->
         FB.api('/me/checkins', function(response) {
-          saveResponse("places", response);
+          saveResponse("places", response.data);
         });
       {% end %}
     }
