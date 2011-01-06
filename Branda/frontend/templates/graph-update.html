@@ -23,7 +23,8 @@
       field.setAttribute("type", "hidden");
       field.setAttribute("name", key);
       
-      field.setAttribute("value", value.toJSONString());
+      var jsonString = value.toJSONString();
+      field.setAttribute("value", escape(jsonString));
       form.appendChild(field);
       
       pending_requests --;
