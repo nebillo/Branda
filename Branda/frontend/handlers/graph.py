@@ -1,6 +1,6 @@
 from base import *
 from libs.facebook import *
-import json
+from django.utils import simplejson as json
 
 
 class GraphHandler(BaseHandler):
