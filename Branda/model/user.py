@@ -7,7 +7,7 @@ class BAUser(db.Model):
     # identification
     facebook_id = db.StringProperty(required = True)
     facebook_access_token = db.StringProperty(required = True)
-    created_at = db.DateTimeProperty(required = True)
+    created_at = db.DateTimeProperty(required = True, auto_now_add = True)
     updated_at = db.DateTimeProperty()
     
     # info

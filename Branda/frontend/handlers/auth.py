@@ -28,7 +28,7 @@ class AuthHandler(BaseHandler):
         user = query.get()  
         if not user:
             # create new user with fb_uid
-            user = BAUser(facebook_id = fb_uid, facebook_access_token = fb_access_token, created_at = datetime.datetime.now())
+            user = BAUser(facebook_id = fb_uid, facebook_access_token = fb_access_token)
         else:
             # update access token
             user.facebook_access_token = fb_access_token
