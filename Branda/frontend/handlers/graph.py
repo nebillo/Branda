@@ -48,7 +48,10 @@ class GraphDataHandler(BaseHandler):
         
         self.write(json_encode({"updated": updated}))
         
-        user.updated_at = datetime.datetime.now()
+        if self.get_argument("until_date"):
+            user.updated_at = datetime.datetime.fromtimestamp(float(self.get_argument("until_date")))
+        else:
+            user.updated_at = datetime.datetime.now()
         user.put()
         
     
