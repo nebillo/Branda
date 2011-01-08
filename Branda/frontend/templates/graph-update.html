@@ -1,35 +1,33 @@
 {% extends "base.html" %}
 
 {% block head %}
+  <script src="/js/json.js"></script>
+  <script src="/js/util.js"></script>
 {% end %}
 
 
 {% block body %}
 
   <p id="wait">updating your things...</p>
-  <form id="data" action="/graph/data" method="post">
-    {{ xsrf_form_html() }}
-  </form>
   
   <div id="fb-root"></div>
-  <script src="/js/json.js"></script>
   <script>
     
     var pending_requests = 4;
+    var post_data = "_xsrf=" + getCookie("_xsrf");
     
     function saveResponse(key, value) {
-      form = document.getElementById("data");
-      field = document.createElement("input");
-      field.setAttribute("type", "hidden");
-      field.setAttribute("name", key);
-      
       var jsonString = value.toJSONString();
-      field.setAttribute("value", escape(jsonString));
-      form.appendChild(field);
+      jsonString = encodeURIComponent(jsonString);
+      post_data += "&" + encodeURIComponent(key) + "=" + jsonString;
       
       pending_requests --;
       if (pending_requests <= 0) {
-        form.submit();
+        // post data
+        downloadUrl("/graph/data", "POST", post_data, function(response) {
+          // data posted
+          window.location.reload()
+        });
       }
     }
     
