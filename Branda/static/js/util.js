@@ -70,3 +70,22 @@ function getCookie(name) {
   var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
   return r ? r[1] : undefined;
 }
+
+
+function buildPostData(dictionary) {
+  var string = "";
+  // For each key-value pair
+  var count = 0;
+  for (var key in dictionary) {
+    if (count == 0) {
+      string += "?";
+    } else {
+      string += "&";
+    }
+    var value = dictionary[key];
+    string += encodeURIComponent(key) + "=" + encodeURIComponent(value);
+    count ++;
+  }
+  return string;
+}
+
