@@ -5,6 +5,8 @@ from tornado.escape import *
 
 
 class GraphHandler(BaseHandler):
+    
+    # graph
     @tornado.web.authenticated
     def get(self):
         if self.get_current_user().needsUpdate():
@@ -12,9 +14,13 @@ class GraphHandler(BaseHandler):
         else:
             self.render("graph.html", options = options, title = "Grafo")
     
-    @tornado.web.authenticated    
+
+class GraphDataHandler(BaseHandler):
+    
+    # update user data
+    @tornado.web.authenticated
     def post(self):
-        self.write("update")
+        self.write("update data")
         user = self.get_current_user()
         if self.get_argument("info"):
             info = self.get_argument("info")
@@ -36,4 +42,9 @@ class GraphHandler(BaseHandler):
             places = url_unescape(places)
             places = json.loads(places)
             self.write("<br>received places: " + str(len(places)))
-            
+    
+    # get graph data  
+    @tornado.web.authenticated
+    def get(self):
+        self.write("read data")
+    

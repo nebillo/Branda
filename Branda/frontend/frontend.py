@@ -12,7 +12,7 @@ import os.path
 from config.config import *
 from frontend.handlers.main import MainHandler
 from frontend.handlers.auth import AuthHandler, LoginHandler, LogoutHandler
-from frontend.handlers.graph import GraphHandler
+from frontend.handlers.graph import GraphHandler, GraphDataHandler
 
        
 def main():
@@ -29,7 +29,8 @@ def main():
         (r"/login.*", LoginHandler),
         (r"/logout.*", LogoutHandler),
         (r"/auth.*", AuthHandler),
-        (r"/graph.*", GraphHandler),
+        (r"/graph", GraphHandler),
+        (r"/graph/data", GraphDataHandler),
     ], **settings)
     
     wsgiref.handlers.CGIHandler().run(application)
