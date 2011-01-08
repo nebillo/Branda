@@ -34,6 +34,11 @@ class BAUser(db.Model):
         return time.mktime(self.updated_at.timetuple())
     
     
+    def neverUpdated(self):
+        if not self.updated_at:
+            return True
+        return False
+    
     def needsUpdate(self):
         if not self.updated_at:
             return True

@@ -2,6 +2,7 @@ from base import *
 from libs.facebook import *
 from django.utils import simplejson as json
 from tornado.escape import *
+import datetime
 
 
 class GraphHandler(BaseHandler):
@@ -9,10 +10,10 @@ class GraphHandler(BaseHandler):
     # graph
     @tornado.web.authenticated
     def get(self):
-        if self.get_current_user().needsUpdate():
+        if self.get_current_user().neverUpdated():
             self.render("graph-update.html", options = options, title = "Updating")
         else:
-            self.render("graph.html", options = options, title = "Grafo")
+            self.render("graph.html", options = options, title = "Graph")
     
 
 class GraphDataHandler(BaseHandler):
@@ -22,6 +23,7 @@ class GraphDataHandler(BaseHandler):
     def post(self):
         self.write("update data")
         user = self.get_current_user()
+        
         if self.get_argument("info"):
             info = self.get_argument("info")
             info = url_unescape(info)
@@ -42,6 +44,10 @@ class GraphDataHandler(BaseHandler):
             places = url_unescape(places)
             places = json.loads(places)
             self.write("<br>received places: " + str(len(places)))
+        
+        user.updated_at = datetime.datetime.now()
+        user.put()
+        
     
     # get graph data  
     @tornado.web.authenticated
