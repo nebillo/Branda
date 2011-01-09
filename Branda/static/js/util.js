@@ -72,7 +72,7 @@ function getCookie(name) {
 }
 
 
-function buildPostData(dictionary) {
+function buildQueryString(dictionary) {
   var string = "";
   // For each key-value pair
   var count = 0;

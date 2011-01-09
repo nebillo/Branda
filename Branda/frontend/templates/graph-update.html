@@ -24,7 +24,7 @@
       if (pending_requests <= 0) {
         // prepare post
         post_data["_xsrf"] = getCookie("_xsrf");
-        post_data = buildPostData(post_data);
+        post_data = buildQueryString(post_data);
         // post data
         downloadUrl("/graph/data", "POST", post_data, function(response) {
           // data posted

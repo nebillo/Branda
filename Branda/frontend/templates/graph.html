@@ -3,6 +3,7 @@
 {% block head %}
   <script src="/js/gears_init.js"></script>
   <script src="/js/geo.js"></script>
+  <script src="/js/util.js"></script>
 {% end %}
 
 
@@ -25,6 +26,7 @@
     
     function geo_success(location) {
       document.getElementById("location").innerHTML = "Location: " + location.coords.latitude + "," + location.coords.longitude;
+      getGraphDataAroundLocation(location.coords.latitude, location.coords.longitude);
     }
     
     function geo_error(error) {
@@ -32,6 +34,20 @@
       if (error.code != 1) {
         alert("Could not find you!");
       }
+    }
+    
+    function getGraphDataAroundLocation(latitude, longitude) {
+      // prepare query
+      var params = {
+        "latitude": latitude,
+        "longitude": longitude,
+        "date": new Date().getTime() / 1000,
+      };
+      // get graph data
+      downloadUrl("/graph/data" + buildQueryString(params), "GET", null, function(response) {
+        // data ready
+        console.log(response);
+      });
     }
     
   </script>
