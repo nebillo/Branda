@@ -1,8 +1,42 @@
 {% extends "base.html" %}
 
-{% block title %}Grafo{% end %}
+{% block head %}
+  <script src="/js/gears_init.js"></script>
+  <script src="/js/geo.js"></script>
+{% end %}
+
 
 {% block body %}
+  
+  <script type="text/javascript">
+    
+    window.onload = getCurrentLocation;
+    
+    function getCurrentLocation() {
+      if (geo_position_js.init()) {
+        document.getElementById("location").innerHTML = "Locating…";
+        geo_position_js.getCurrentPosition(
+          geo_success, 
+          geo_error, 
+          { maximumAge: 75000 }
+        ); 
+      }
+    }
+    
+    function geo_success(location) {
+      document.getElementById("location").innerHTML = "Location: " + location.coords.latitude + "," + location.coords.longitude;
+    }
+    
+    function geo_error(error) {
+      document.getElementById("location").innerHTML = "Unknown location";
+      if (error.code != 1) {
+        alert("Could not find you!");
+      }
+    }
+    
+  </script>
+  
+  <div id="location"><div>
   <div id="me">
     ciao: {{ current_user.name }}
   </div>
