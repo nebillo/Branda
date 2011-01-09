@@ -4,6 +4,7 @@
   <script src="/js/gears_init.js"></script>
   <script src="/js/geo.js"></script>
   <script src="/js/util.js"></script>
+  <script src="/js/json.js"></script>
 {% end %}
 
 
@@ -44,17 +45,21 @@
         "date": new Date().getTime() / 1000,
       };
       // get graph data
+      document.getElementById("nodes").innerHTML = "Reading nodes…";
       downloadUrl("/graph/data" + buildQueryString(params), "GET", null, function(response) {
         // data ready
+        response = JSON.parse(response);
         console.log(response);
+        document.getElementById("nodes").innerHTML = "Nodes: " + response.data.length;
       });
     }
     
   </script>
   
-  <div id="location"><div>
   <div id="me">
     ciao: {{ current_user.name }}
   </div>
+  <div id="location"></div>
+  <div id="nodes"></div>
   
 {% end %}
