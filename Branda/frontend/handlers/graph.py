@@ -3,6 +3,7 @@ from libs.facebook import *
 from tornado.escape import *
 import datetime
 import logging
+from model.graph import GraphUpdater
 
 
 class GraphHandler(BaseHandler):
@@ -18,35 +19,48 @@ class GraphHandler(BaseHandler):
 
 class GraphDataHandler(BaseHandler):
     
+    def getFacebookData(self, key):
+        if not self.get_argument(key):
+            return None
+        
+        string = self.get_argument(key)
+        if not string:
+            return None
+        
+        data = json_decode(string)
+        if not data:
+            return None
+            
+        return data
+        
     # update user data
     @tornado.web.authenticated
     def post(self):
-        self.write("update data")
         user = self.get_current_user()
-        updated = False
         
-        if self.get_argument("info"):
-            info = self.get_argument("info")
-            info = json_decode(info)
-            logging.info("received info: " + str(len(info)))
-            updated = True
-        if self.get_argument("likes"):
-            likes = self.get_argument("likes")
-            likes = json_decode(likes)
-            logging.info("received likes: " + str(len(likes)))
-            updated = True
-        if self.get_argument("events"):
-            events = self.get_argument("events")
-            events = json_decode(events)
-            logging.info("received events: " + str(len(events)))
-            updated = True
-        if self.get_argument("places"):
-            places = self.get_argument("places")
-            places = json_decode(places)
-            logging.info("received places: " + str(len(places)))
-            updated = True
+        # read parameters
+        info = self.getFacebookData("info")
+        if not info:
+            raise tornado.web.HTTPError(400)
         
-        self.write(json_encode({"updated": updated}))
+        likes = self.getFacebookData("likes")
+        if not likes:
+            raise tornado.web.HTTPError(400)
+        
+        events = self.getFacebookData("events")
+        if not events:
+            raise tornado.web.HTTPError(400)
+        
+        places = self.getFacebookData("places")
+        if not places:
+            raise tornado.web.HTTPError(400)
+        
+        logging.info("user: %s, received info: %d, likes: %d, events: %d, places: %d", user.facebook_id, len(info), len(likes), len(events), len(places))
+        
+        updater = GraphUpdater(user)
+        nodes_updated = updater.updateNodes(info = info, likes = likes, places = places, events = events)
+        
+        self.write(json_encode({ "nodes_updated": nodes_updated }))
         
         if self.get_argument("until_date"):
             user.updated_at = datetime.datetime.fromtimestamp(float(self.get_argument("until_date")))
