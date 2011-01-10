@@ -19,17 +19,14 @@ class GraphHandler(BaseHandler):
 
 class GraphDataHandler(BaseHandler):
     
-    def getFacebookData(self, key):
-        if not self.get_argument(key):
-            return None
-        
+    def getFacebookData(self, key, default = None):
         string = self.get_argument(key)
         if not string:
-            return None
+            return default
         
         data = json_decode(string)
         if not data:
-            return None
+            return default
             
         return data
         
@@ -41,19 +38,11 @@ class GraphDataHandler(BaseHandler):
         # read parameters
         info = self.getFacebookData("info")
         if not info:
-            raise tornado.web.HTTPError(400)
-        
-        likes = self.getFacebookData("likes")
-        if not likes:
-            raise tornado.web.HTTPError(400)
-        
-        events = self.getFacebookData("events")
-        if not events:
-            raise tornado.web.HTTPError(400)
-        
-        places = self.getFacebookData("places")
-        if not places:
-            raise tornado.web.HTTPError(400)
+          raise tornado.web.HTTPError(400)
+          
+        likes = self.getFacebookData("likes", [])
+        events = self.getFacebookData("events", [])
+        places = self.getFacebookData("places", [])
         
         logging.info("user: %s, received info: %d, likes: %d, events: %d, places: %d", user.facebook_id, len(info), len(likes), len(events), len(places))
         
