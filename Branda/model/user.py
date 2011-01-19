@@ -3,8 +3,7 @@ import datetime
 import time
 
 
-class BAUser(db.Model):
-    # identification
+class User(db.Model):
     facebook_id = db.StringProperty(required = True)
     facebook_access_token = db.StringProperty(required = True)
     created_at = db.DateTimeProperty(required = True, auto_now_add = True)

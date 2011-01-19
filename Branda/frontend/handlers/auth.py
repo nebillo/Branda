@@ -23,12 +23,12 @@ class AuthHandler(BaseHandler):
         self.set_secure_cookie("user", fb_uid)
         
         # read user from db with fb_uid
-        query = BAUser.all()
+        query = User.all()
         query.filter('facebook_id =', fb_uid)
         user = query.get()  
         if not user:
             # create new user with fb_uid
-            user = BAUser(facebook_id = fb_uid, facebook_access_token = fb_access_token)
+            user = User(facebook_id = fb_uid, facebook_access_token = fb_access_token)
         else:
             # update access token
             user.facebook_access_token = fb_access_token

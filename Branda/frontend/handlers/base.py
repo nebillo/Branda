@@ -29,7 +29,7 @@ class BaseHandler(tornado.web.RequestHandler):
             return None
         
         # read user from db with fb_uid
-        query = BAUser.all()
+        query = User.all()
         query.filter('facebook_id =', fb_uid)
         user = query.get()
         return user
