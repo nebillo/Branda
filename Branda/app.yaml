@@ -12,6 +12,8 @@ handlers:
   static_dir: static/img
 - url: /static
   static_dir: static
+- url: /test.*
+  script: gaeunit.py
 - url: /.*
   script: frontend/frontend.py
 
