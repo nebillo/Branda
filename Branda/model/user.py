@@ -1,6 +1,7 @@
 from google.appengine.ext import db
 import datetime
 import time
+from thing import Religion, Political
 
 
 class User(db.Model):
@@ -9,7 +10,6 @@ class User(db.Model):
     created_at = db.DateTimeProperty(required = True, auto_now_add = True)
     updated_at = db.DateTimeProperty()
     
-    # info
     name = db.StringProperty()
     fullname = db.StringProperty()
     name = db.StringProperty()
@@ -17,21 +17,17 @@ class User(db.Model):
     email = db.EmailProperty()
     gender = db.StringProperty(choices = set(["male", "female"]))
     location = db.GeoPtProperty()
-    religion = db.StringProperty()
-    political = db.StringProperty()
+    religion = db.ReferenceProperty(Religion)
+    political = db.ReferenceProperty(Political)
     locale = db.StringProperty()
     
-    # likes
-    
-    # events
-    
-    # places
+    things = db.ListProperty(db.Key)
+    venues = db.ListProperty(db.Key)
     
     def updatedAtInUnixFormat(self):
         if not self.updated_at:
             return 0.0
         return time.mktime(self.updated_at.timetuple())
-    
     
     def neverUpdated(self):
         if not self.updated_at:
@@ -43,37 +39,3 @@ class User(db.Model):
             return True
         # check updated_at
         return False
-       
-     
-    def updateInfo(self, values):
-        self.name = values["first_name"]
-        self.fullname = values["name"]
-        self.email = values["email"]
-        if "gender" in values:
-            self.gender = values["gender"]
-        if "political" in values:
-            self.political = values["political"]
-        if "religion" in values:
-            self.religion = values["religion"]
-        self.locale = values["locale"]
-        
-        self.put()
-    
-        
-    def updateLikes(self, likes):
-        #TOOD: implement
-        
-        self.put()
-        
-          
-    def updateEvents(self, events):
-        #TOOD: implement
-        
-        self.put()
-    
-    
-    def updatePlaces(self, places):
-        #TOOD: implement
-        
-        self.put()
-        
