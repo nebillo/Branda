@@ -20,3 +20,8 @@ class Checkup(unittest.TestCase):
     def test_affinity(self):
         from model.affinity import Affinity, UserLinking, VenueLinking
         self.assertTrue(True)
+
+    def test_graph(self):
+        from model.graph import GraphUpdater
+        self.assertTrue(True)
+        
