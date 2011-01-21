@@ -12,7 +12,7 @@ class User(db.Model):
     
     name = db.StringProperty()
     fullname = db.StringProperty()
-    name = db.StringProperty()
+    lastname = db.StringProperty()
     birthdate = db.DateProperty()
     email = db.EmailProperty()
     gender = db.StringProperty(choices = set(["male", "female"]))
