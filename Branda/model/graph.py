@@ -11,6 +11,10 @@ from venue import Venue, Place, Event
 # update the graph nodes with the facebook user data
 class GraphUpdater:
     
+    kPageType = "page"
+    kPlaceType = "place"
+    kEventType = "event"
+    
     # initialize with a user
     def __init__(self, user):
         self.user = user;
@@ -37,7 +41,7 @@ class GraphUpdater:
         # scorro ogni elemento della lista
         for element in stream:
             # pagina:
-            if element.type == "page":
+            if element.type == GraphUpdater.kPageType:
                 # inizilizzo pagina
                 page = self.pageFromData(element)
                 # connetto utente a pagina ()
@@ -45,9 +49,9 @@ class GraphUpdater:
                 ## coppie_utente += utente-pagina
             
             # venue:
-            if element.type == "place" or element.type == "event":
+            if element.type == GraphUpdater.kPlaceType or element.type == GraphUpdater.kEventType:
                 # inizializzo venue
-                if element.type == "place":
+                if element.type == GraphUpdater.kPlaceType:
                     venue = self.placeFromData(element)
                 else:
                     venue = self.eventFromData(element)
@@ -143,8 +147,18 @@ class GraphUpdater:
     
     
     def getStreamByMergingData(self, likes, events, places):
-        return []
+        self.addTypeToObjects(likes, GraphUpdater.kPageType)
+        self.addTypeToObjects(events, GraphUpdater.kEventType)
+        self.addTypeToObjects(places, GraphUpdater.kPlaceType)
+        merge = self.mergeOrderedArrays(likes, "created_time", places, "created_time")
+        merge = self.mergeOrderedArrays(merge, "created_time", events, "start_time")
+        return merge
     
+    
+    def addTypeToObjects(self, objects, value):
+        for obj in objects:
+            obj["type"] = value
+            
     
     def mergeOrderedArrays(self, first_list, first_field, second_list, second_field):
         merge = []
