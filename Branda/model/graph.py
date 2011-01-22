@@ -4,7 +4,7 @@ import logging
 from libs import iso8601
 
 from user import User
-from thing import Thing
+from thing import Thing, Page
 from venue import Venue, Place, Event
 
 
@@ -185,7 +185,12 @@ class GraphUpdater:
     
     # nuova istanza di una pagina dai dati di fb
     def pageFromData(self, data):
-        return None
+        page = Page(name = data["name"], facebook_id = data["id"])
+        if "category" in data:
+            page.category = data["category"]
+        if "picture" in data:
+            page.picture_url = data["picture"]
+        return page
     
     # nuova istanza di un luogo dai dati di fb
     def placeFromData(self, data):

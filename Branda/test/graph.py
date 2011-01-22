@@ -103,3 +103,21 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(merged[-1]["type"], GraphUpdater.kPageType)
         self.assertTrue(merged[-1]["created_time"], "2010-01-12T00:22:53+0000")
     
+    def test_page_from_data(self):
+        user = User(facebook_id = "fake", facebook_access_token = "fake")
+        updater = GraphUpdater(user)
+        
+        data = {
+            "name": "sabato sera teenager", 
+            "id": "xxx", 
+            "category": "other", 
+            "picture": "http://saturday/teen.jpg"
+        }
+        page = updater.pageFromData(data)
+        self.assertTrue(isinstance(page, Page))
+        self.assertEqual(page.facebook_id, "xxx")
+        self.assertEqual(page.name, "sabato sera teenager")
+        self.assertEqual(page.category, "other")
+        self.assertEqual(page.picture_url, "http://saturday/teen.jpg")
+        
+    
