@@ -114,10 +114,29 @@ class GraphTests(unittest.TestCase):
             "picture": "http://saturday/teen.jpg"
         }
         page = updater.pageFromData(data)
+        
         self.assertTrue(isinstance(page, Page))
         self.assertEqual(page.facebook_id, "xxx")
         self.assertEqual(page.name, "sabato sera teenager")
         self.assertEqual(page.category, "other")
         self.assertEqual(page.picture_url, "http://saturday/teen.jpg")
+        
+    def test_place_from_data(self):
+        user = User(facebook_id = "fake", facebook_access_token = "fake")
+        updater = GraphUpdater(user)
+        
+        data = {
+            "name": "the box", 
+            "id": "place-id", 
+            "location": {"latitude": 12.22, "longitude": 34.55},
+        }
+        data = {"id": "check-in id", "place": data}
+        
+        place = updater.placeFromData(data)
+        self.assertTrue(isinstance(place, Place))
+        self.assertEqual(place.facebook_id, "place-id")
+        self.assertEqual(place.name, "the box")
+        self.assertEqual(place.location.lat, 12.22)
+        self.assertEqual(place.location.lon, 34.55)
         
     

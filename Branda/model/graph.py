@@ -2,6 +2,7 @@ import datetime
 import logging
 
 from libs import iso8601
+from google.appengine.ext import db
 
 from user import User
 from thing import Thing, Page
@@ -194,7 +195,10 @@ class GraphUpdater:
     
     # nuova istanza di un luogo dai dati di fb
     def placeFromData(self, data):
-        return None
+        data = data["place"]
+        coordinate = db.GeoPt(data["location"]["latitude"], data["location"]["longitude"])
+        place = Place(name = data["name"], facebook_id = data["id"], location = coordinate)
+        return place
     
     # nuova istanza di un evento dai dati di fb
     def eventFromData(self, data):
