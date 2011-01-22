@@ -19,11 +19,21 @@ class Place(Venue):
 
 class Event(Venue):
     name = db.StringProperty(required = True)
+    description = db.StringProperty()
     picture_url = db.LinkProperty()
     period = db.ListProperty(datetime.datetime)
     
     venue_name = db.StringProperty(required = True)
-    street = db.StringProperty()
-    city = db.StringProperty()
-    state = db.StringProperty()
+    address = db.PostalAddressProperty()
     country = db.StringProperty()
+    
+    
+    def startTime(self):
+        if len(self.period) > 0:
+            return self.period[0]
+        return None
+    
+    def endTime(self):
+        if len(self.period) > 1:
+            return self.period[1]
+        return self.startTime()

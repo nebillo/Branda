@@ -202,8 +202,40 @@ class GraphUpdater:
     
     # nuova istanza di un evento dai dati di fb
     def eventFromData(self, data):
-        return None
+        venue = data["venue"]
+        coordinate = db.GeoPt(venue["latitude"], venue["longitude"])
+        
+        event = Event(facebook_id = data["id"], location = coordinate, name = data["name"], venue_name = data["location"])
+        
+        event.country = venue["country"]
+        event.address = self.postalAddressFromVenueData(venue)
+        
+        event.period = [iso8601.parse_date(data["start_time"]), iso8601.parse_date(data["end_time"])]
+        
+        if "description" in data:
+            event.description = data["description"]
+        if "picture" in data:
+            event.picture_url = data["picture"]
+            
+        return event
     
+    def postalAddressFromVenueData(self, data):
+        address = ""
+        
+        if "street" in data:
+            address += ", " + data["street"]
+        if "city" in data:
+            address += ", " + data["city"]
+        if "zip" in data:
+            address += ", " + data["zip"]
+        if "state" in data:
+            address += ", " + data["state"]
+            
+        if address[:2] == ", ":
+            address = address[2:]
+            
+        address = db.PostalAddress(address)
+        return address
     
     # connessione utente e cosa
     def connectUserToThing(self, usser, data):

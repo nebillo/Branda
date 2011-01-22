@@ -139,4 +139,42 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(place.location.lat, 12.22)
         self.assertEqual(place.location.lon, 34.55)
         
+    def test_event_from_data(self):
+        user = User(facebook_id = "fake", facebook_access_token = "fake")
+        updater = GraphUpdater(user)
+        
+        venue = {
+            "latitude": 12.22, 
+            "longitude": 34.55,
+            "street": "street",
+            "city": "city",
+            "zip": "zip",
+            "state": "state",
+            "country": "it"
+        }
+        data = {
+            "name": "pugni e peae",
+            "description": "tutti quanti i se copa de pugni",
+            "id": "xxx", 
+            "location": "casa de luca",
+            "venue": venue,
+            "start_time": "2011-01-12T22:30:55+0000",
+            "end_time": "2011-02-12T04:30:55+0000",
+            "picture": "http://luca.com"
+        }
+        
+        event = updater.eventFromData(data)
+        self.assertTrue(isinstance(event, Event))
+        self.assertEqual(event.facebook_id, "xxx")
+        self.assertEqual(event.location.lat, 12.22)
+        self.assertEqual(event.location.lon, 34.55)
+        self.assertEqual(event.name, "pugni e peae")
+        self.assertEqual(event.description, "tutti quanti i se copa de pugni")
+        self.assertEqual(event.picture_url, "http://luca.com")
+        self.assertEqual(event.venue_name, "casa de luca")
+        self.assertEqual(event.country, "it")
+        self.assertEqual(event.address, "street, city, zip, state")
+        self.assertEqual(event.startTime().strftime("%H:%M"), "22:30")
+        self.assertEqual(event.endTime().strftime("%H:%M"), "04:30")
+        
     
