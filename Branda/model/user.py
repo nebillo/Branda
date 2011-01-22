@@ -11,9 +11,9 @@ class User(db.Model):
     updated_at = db.DateTimeProperty()
     
     name = db.StringProperty()
-    fullname = db.StringProperty()
-    lastname = db.StringProperty()
-    birthdate = db.DateProperty()
+    first_name = db.StringProperty()
+    last_name = db.StringProperty()
+    birthday = db.DateProperty()
     email = db.EmailProperty()
     gender = db.StringProperty(choices = set(["male", "female"]))
     location = db.GeoPtProperty()

@@ -105,6 +105,22 @@ class GraphUpdater:
         
         
     def updateUserBasicInfo(self, user, info):
+        if "first_name" in info:
+            user.first_name = info["first_name"]
+        if "last_name" in info:
+            user.last_name = info["last_name"]
+        if "name" in info:
+            user.name = info["name"]
+        if "email" in info:
+            user.email = info["email"]
+        if "locale" in info:
+            user.locale = info["locale"]
+        if "gender" in info:
+            user.gender = info["gender"]
+        if "birthday" in info:
+            birthday = info["birthday"]
+            birthday = datetime.datetime.strptime(birthday, "%m/%d/%Y")
+            user.birthday = birthday.date()
         return
     
     def updateReligionFromData(self, user, info):
