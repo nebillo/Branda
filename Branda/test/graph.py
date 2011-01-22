@@ -46,3 +46,17 @@ class GraphTests(unittest.TestCase):
         second_date = iso8601.parse_date("2010-01-20T12:30:55+02:00")
         self.assertEqual(first_date, second_date)
     
+    def test_merge(self):
+        user = User(facebook_id = "fake", facebook_access_token = "fake")
+        updater = GraphUpdater(user)
+        
+        first = [{"date": "2011-03-12T00:22:18+0000"}, {"date": "2011-01-12T00:22:18+0000"}]
+        second = [{"date2": "2011-04-12T00:22:18+0000"}, {"date2": "2011-02-12T00:22:18+0000"}]
+        merge = updater.mergeOrderedArrays(first, "date", second, "date2")
+        
+        self.assertEquals(merge[0], second[0])
+        self.assertEquals(merge[1], first[0])
+        self.assertEquals(merge[2], second[1])
+        self.assertEquals(merge[3], first[1])
+    
+    

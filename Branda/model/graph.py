@@ -1,6 +1,8 @@
 import datetime
 import logging
 
+from libs import iso8601
+
 from user import User
 from thing import Thing
 from venue import Venue, Place, Event
@@ -143,6 +145,29 @@ class GraphUpdater:
     def getStreamByMergingData(self, likes, events, places):
         return []
     
+    
+    def mergeOrderedArrays(self, first_list, first_field, second_list, second_field):
+        merge = []
+        first_index = 0
+        second_index = 0
+        
+        while first_index < len(first_list) and second_index < len(second_list):
+            first = first_list[first_index]
+            second = second_list[second_index]
+            first_date = iso8601.parse_date(first[first_field])
+            second_date = iso8601.parse_date(second[second_field])
+            if first_date > second_date:
+                merge.append(first)
+                first_index += 1
+            else:
+                merge.append(second)
+                second_index += 1
+        
+        merge.extend(first_list[first_index:])
+        merge.extend(second_list[second_index:])
+        
+        return merge
+        
     
     # nuova istanza di una pagina dai dati di fb
     def pageFromData(self, data):
