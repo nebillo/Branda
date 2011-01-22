@@ -1,5 +1,6 @@
 import unittest
 from model.graph import *
+from libs import iso8601
 
 
 class GraphTests(unittest.TestCase):
@@ -31,3 +32,17 @@ class GraphTests(unittest.TestCase):
         self.assertEquals(user.gender, "female")
         self.assertEquals(user.locale, "it_IT")
         self.assertEquals(user.birthday.strftime("%m/%d/%Y"), "03/20/1987")
+    
+    def test_compare_iso_dates(self):
+        first_date  = iso8601.parse_date("2011-01-12T12:30:55+0000")
+        second_date = iso8601.parse_date("2011-02-04T05:30:00+0000")
+        self.assertTrue(first_date < second_date)
+        
+        first_date  = iso8601.parse_date("2012-01-12T12:30:55+0000")
+        second_date = iso8601.parse_date("2010-02-04T05:30:00+0000")
+        self.assertTrue(first_date > second_date)
+        
+        first_date  = iso8601.parse_date("2010-01-20T10:30:55+0000")
+        second_date = iso8601.parse_date("2010-01-20T12:30:55+02:00")
+        self.assertEqual(first_date, second_date)
+    
