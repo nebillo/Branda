@@ -23,7 +23,7 @@ class GraphTests(unittest.TestCase):
             "locale": "it_IT",
             "birthday": "03/20/1987",
         }
-        updater.updateNodes(info = info, likes = [], places = [], events = [])
+        updater.updateUserBasicInfo(info)
         
         self.assertEquals(user.first_name, "luca")
         self.assertEquals(user.last_name, "milan")

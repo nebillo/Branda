@@ -29,7 +29,7 @@ class GraphUpdater:
         user_linkings = []
         
         # aggiorno le info utente non indicizzate
-        self.updateUserBasicInfo(self.user, info)
+        self.updateUserBasicInfo(info)
         
         # aggiorno le info indicizzate
         self.updateReligionFromData(self.user, info)
@@ -111,23 +111,23 @@ class GraphUpdater:
         return len(affinities) > 0
         
         
-    def updateUserBasicInfo(self, user, info):
+    def updateUserBasicInfo(self, info):
         if "first_name" in info:
-            user.first_name = info["first_name"]
+            self.user.first_name = info["first_name"]
         if "last_name" in info:
-            user.last_name = info["last_name"]
+            self.user.last_name = info["last_name"]
         if "name" in info:
-            user.name = info["name"]
+            self.user.name = info["name"]
         if "email" in info:
-            user.email = info["email"]
+            self.user.email = info["email"]
         if "locale" in info:
-            user.locale = info["locale"]
+            self.user.locale = info["locale"]
         if "gender" in info:
-            user.gender = info["gender"]
+            self.user.gender = info["gender"]
         if "birthday" in info:
             birthday = info["birthday"]
             birthday = datetime.datetime.strptime(birthday, "%m/%d/%Y")
-            user.birthday = birthday.date()
+            self.user.birthday = birthday.date()
         return
     
     def updateReligionFromData(self, user, info):
