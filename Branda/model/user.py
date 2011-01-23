@@ -24,6 +24,19 @@ class User(db.Model):
     things = db.ListProperty(db.Key)
     venues = db.ListProperty(db.Key)
     
+    def getAge(self):
+        """
+        ritorna gli anni di eta' dell'utente come numero reale
+        """
+        if not self.birthday:
+            return 0.0
+        
+        today = datetime.date.today()
+        period = today - self.birthday
+        return (period.days) / 365.0
+        
+    age = property(getAge)
+    
     def updatedAtInUnixFormat(self):
         if not self.updated_at:
             return 0.0
