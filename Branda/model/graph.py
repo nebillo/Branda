@@ -7,7 +7,7 @@ from google.appengine.ext import db
 from user import User
 from thing import Thing, Page
 from venue import Venue, Place, Event
-from affinity import UserLinking
+from affinity import UserLinking, VenueLinking
 
 
 # update the graph nodes with the facebook user data
@@ -343,10 +343,25 @@ class GraphUpdater:
     
     
     def connectVenueToThing(self, venue, thing):
-        # se non esiste legame tra $venue e $cosa:
-            # creo legame
-        # incremento legame
-        return None
+        """
+        crea un legame tra venue e thing
+        o incrementa il legame se esiste
+        """
+        query = VenueLinking.all()
+        query.filter('venue =', venue)
+        query.filter('thing =', thing)
+        linking = query.get()
+        
+        if linking:
+            # cosa gia' connessa
+            linking.count += 1
+        else:
+            # cosa non connessa
+            # connetto
+            linking = VenueLinking(venue = venue, thing = thing, count = 1)
+            
+        linking.put()
+        return linking
     
     
     def increaseUserLinkingWithThing(self, user, thing):

@@ -241,4 +241,22 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(len(same_venues), len(venues))
         self.assertEqual(place.people, 1, "ignoring same user")
         
+    def test_connect_venue_to_thing(self):
+        place = Place(name = "casa di luca", facebook_id = "xxx", location = db.GeoPt(12.22, 24.44))
+        place.put()
+        
+        page = Page(name = "ci piace luca", facebook_id = "xxx")
+        page.put()
+        
+        updater = GraphUpdater(User(facebook_id = "fake", facebook_access_token = "fake"))
+        linking = updater.connectVenueToThing(place, page)
+        self.assertTrue(isinstance(linking, VenueLinking))
+        self.assertEqual(linking.venue, place)
+        self.assertEqual(linking.thing, page)
+        self.assertEqual(linking.count, 1)
+        
+        same_linking = updater.connectVenueToThing(place, page)
+        self.assertEqual(linking.key(), same_linking.key())
+        self.assertEqual(same_linking.count, 2)
+        
     
