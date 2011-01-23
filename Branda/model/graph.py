@@ -225,8 +225,20 @@ class GraphUpdater:
         place.put()
         return place
     
-    # nuova istanza di un evento dai dati di fb
+    
     def eventFromData(self, data):
+        """
+        costruisce una istanza di Event a partire da un evento di facebook
+        o ritorna l'istanza salvata se esiste
+        """
+        # read event if exists
+        query = Event.all()
+        query.filter('facebook_id =', data["id"])
+        event = query.get()
+        if event:
+            return event
+            
+        # create new event
         venue = data["venue"]
         coordinate = db.GeoPt(venue["latitude"], venue["longitude"])
         
@@ -241,10 +253,15 @@ class GraphUpdater:
             event.description = data["description"]
         if "picture" in data:
             event.picture_url = data["picture"]
-            
+        event.put()
         return event
     
+    
     def postalAddressFromVenueData(self, data):
+        """
+        costruisce una PostalAddress concatenando le varie informazioni presenti in data
+        esempio: via topo 69/b, zelarino, 30174, VE
+        """
         address = ""
         
         if "street" in data:

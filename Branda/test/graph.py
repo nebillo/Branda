@@ -184,4 +184,7 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(event.startTime().strftime("%H:%M"), "22:30")
         self.assertEqual(event.endTime().strftime("%H:%M"), "04:30")
         
+        same_event = updater.eventFromData(data)
+        self.assertEqual(event.key(), same_event.key())
+        
     
