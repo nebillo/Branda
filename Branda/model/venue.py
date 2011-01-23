@@ -12,6 +12,24 @@ class Venue(polymodel.PolyModel):
     target_age = db.FloatProperty()
     people = db.IntegerProperty(required = True, default = 0)
 
+    def updateTargetAgeWithUser(self, user):
+        """
+        aggiorna l'eta' media della venue con quella dell'utente
+        basandosi sulla sommatoria di tutte le eta' delle persone
+        """
+        age = user.age;
+        if not age:
+            return
+            
+        if self.people == 0:
+            self.target_age = age
+        else:
+            self.target_age = (self.target_age * self.people + age) / (self.people + 1)
+        self.people += 1
+        self.put()
+        
+        return self.target_age
+
 
 class Place(Venue):
     name = db.StringProperty(required = True)
