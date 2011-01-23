@@ -7,6 +7,7 @@ from google.appengine.ext import db
 from user import User
 from thing import Thing, Page
 from venue import Venue, Place, Event
+from affinity import UserLinking
 
 
 # update the graph nodes with the facebook user data
@@ -45,8 +46,10 @@ class GraphUpdater:
             if element.type == GraphUpdater.kPageType:
                 # inizilizzo pagina
                 page = self.pageFromData(element)
-                # connetto utente a pagina ()
-                page = self.connectUserToThing(self.user, page)
+                # connetto utente a pagina
+                page = self.connectUserToThing(page, 3)
+                # e aggiungo all'elenco delle cose proprie
+                self.addThingToUserList(page)
                 ## coppie_utente += utente-pagina
             
             # venue:
@@ -73,7 +76,7 @@ class GraphUpdater:
                 # per ogni $cosa in $cose_venue:
                 for thing in venue_things_unitl_now:
                     # instauro o aumento legame tra utente e cosa
-                    self.connectUserToThing(self.user, thing)
+                    self.connectUserToThing(thing)
                     ## coppie_utente += utente-pagina
                     
                 # per ogni $cosa in $cose_utente non in $cose_venue:
@@ -279,15 +282,36 @@ class GraphUpdater:
         address = db.PostalAddress(address)
         return address
     
-    # connessione utente e cosa
-    def connectUserToThing(self, usser, data):
-        # cosa gia' connessa:
-            # +1
-        # cosa non connessa:
+    
+    def connectUserToThing(self, thing, increment = 1):
+        """
+        crea un legame tra user e thing
+        o incrementa il legame se esiste
+        """
+        query = UserLinking.all()
+        query.filter('user =', self.user)
+        query.filter('thing =', thing)
+        linking = query.get()
+        
+        if linking:
+            # cosa gia' connessa
+            linking.count += increment
+        else:
+            # cosa non connessa
             # connetto
-            # +3
-            # aggiungo a cose di utente
-        return None
+            linking = UserLinking(user = self.user, thing = thing, count = increment)
+            
+        linking.put()
+        return linking
+    
+    
+    def addThingToUserList(self, thing):
+        """
+        thing viene aggiunta alle cose dell'utente
+        nel caso non sia gia' presente
+        """
+        pass
+    
     
     def increaseUserLinkingWithThing(self, user, thing):
         return

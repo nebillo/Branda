@@ -187,4 +187,22 @@ class GraphTests(unittest.TestCase):
         same_event = updater.eventFromData(data)
         self.assertEqual(event.key(), same_event.key())
         
+    def test_connect_user_to_thing(self):
+        user = User(facebook_id = "fake", facebook_access_token = "fake")
+        user.put()
+        
+        page = Page(name = "ci piace luca", facebook_id = "xxx")
+        page.put()
+        
+        updater = GraphUpdater(user)
+        linking = updater.connectUserToThing(page, 3)
+        self.assertTrue(isinstance(linking, UserLinking))
+        self.assertEqual(linking.user, user)
+        self.assertEqual(linking.thing, page)
+        self.assertEqual(linking.count, 3)
+        
+        same_linking = updater.connectUserToThing(page)
+        self.assertEqual(linking.key(), same_linking.key())
+        self.assertEqual(same_linking.count, 4)
+        
     
