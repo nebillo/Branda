@@ -143,6 +143,9 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(place.location.lat, 12.22)
         self.assertEqual(place.location.lon, 34.55)
         
+        same_place = updater.placeFromData(data)
+        self.assertEqual(place.key(), same_place.key())
+        
     def test_event_from_data(self):
         user = User(facebook_id = "fake", facebook_access_token = "fake")
         updater = GraphUpdater(user)

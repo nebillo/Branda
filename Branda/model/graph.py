@@ -205,11 +205,24 @@ class GraphUpdater:
         page.put()
         return page
     
-    # nuova istanza di un luogo dai dati di fb
+    
     def placeFromData(self, data):
+        """
+        costruisce una istanza di Place a partire da un checkin di facebook
+        o ritorna l'istanza salvata se esiste
+        """
+        # read place if exists
         data = data["place"]
+        query = Place.all()
+        query.filter('facebook_id =', data["id"])
+        place = query.get()
+        if place:
+            return place
+            
+        # create new place
         coordinate = db.GeoPt(data["location"]["latitude"], data["location"]["longitude"])
         place = Place(name = data["name"], facebook_id = data["id"], location = coordinate)
+        place.put()
         return place
     
     # nuova istanza di un evento dai dati di fb
