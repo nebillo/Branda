@@ -220,4 +220,19 @@ class GraphTests(unittest.TestCase):
         same_things = updater.addThingToUserList(page)
         self.assertEqual(len(same_things), len(things))
         
+    def test_add_venue_to_user_list(self):
+        user = User(facebook_id = "fake", facebook_access_token = "fake")
+        user.put()
+        
+        place = Place(name = "casa di luca", facebook_id = "xxx", location = db.GeoPt(12.22, 24.44))
+        place.put()
+        
+        updater = GraphUpdater(user)
+        venues = updater.addVenueToUserList(place)
+        self.assertTrue(isinstance(venues, list))
+        self.assertTrue(place.key() in venues)
+        
+        same_venues = updater.addVenueToUserList(place)
+        self.assertEqual(len(same_venues), len(venues))
+        
     

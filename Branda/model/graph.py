@@ -60,7 +60,7 @@ class GraphUpdater:
                 else:
                     venue = self.eventFromData(element)
                 # connetto utente a venue ()
-                venue = self.connectUserToVenue(self.user, venue)
+                venue = self.addVenueToUserList(self.user, venue)
                 
                 # $cose_utente = cose collegate ad utente fino a quel momento
                 user_things_until_now = self.user.linked_things()
@@ -321,15 +321,25 @@ class GraphUpdater:
         return things
     
     
-    def increaseUserLinkingWithThing(self, user, thing):
-        return
-    
-    # connessione utente a venue
-    def connectUserToVenue(self, user, data):
-        # venue non connesso:
-            # aggiungo a venue di utente
+    def addVenueToUserList(self, venue):
+        """
+        venue viene aggiunta alle venue dell'utente
+        nel caso non sia gia' presente
+        inoltre aggiorno la media dell'eta della venue
+        """
+        venues = self.user.venues
+        for existing_venue in venues:
+            if existing_venue == venue.key():
+                # found
+                return venues
+        # not found, add
+        venues.append(venue.key())
+        self.user.put()
+        
         # aggiorno media eta'
-        return None
+        
+        return venues
+    
     
     def connectVenueToThing(self, venue, thing):
         # se non esiste legame tra $venue e $cosa:
@@ -338,8 +348,13 @@ class GraphUpdater:
         return None
     
     
+    def increaseUserLinkingWithThing(self, user, thing):
+        return
+    
+    
     def users_linked_to_thing(self, thing):
         return []
+    
     
     def venues_linked_to_thing(self, thing):
         return []
