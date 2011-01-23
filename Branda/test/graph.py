@@ -205,4 +205,19 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(linking.key(), same_linking.key())
         self.assertEqual(same_linking.count, 4)
         
+    def test_add_thing_to_user_list(self):
+        user = User(facebook_id = "fake", facebook_access_token = "fake")
+        user.put()
+        
+        page = Page(name = "ci piace luca", facebook_id = "xxx")
+        page.put()
+        
+        updater = GraphUpdater(user)
+        things = updater.addThingToUserList(page)
+        self.assertTrue(isinstance(things, list))
+        self.assertTrue(page.key() in things)
+        
+        same_things = updater.addThingToUserList(page)
+        self.assertEqual(len(same_things), len(things))
+        
     

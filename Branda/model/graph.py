@@ -310,7 +310,15 @@ class GraphUpdater:
         thing viene aggiunta alle cose dell'utente
         nel caso non sia gia' presente
         """
-        pass
+        things = self.user.things
+        for existing_thing in things:
+            if existing_thing == thing.key():
+                # found
+                return things
+        # not found, add
+        things.append(thing.key())
+        self.user.put()
+        return things
     
     
     def increaseUserLinkingWithThing(self, user, thing):
