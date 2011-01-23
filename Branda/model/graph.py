@@ -184,13 +184,25 @@ class GraphUpdater:
         return merge
         
     
-    # nuova istanza di una pagina dai dati di fb
     def pageFromData(self, data):
+        """
+        costruisce una istanza di Page a partire da un like di facebook
+        o ritorna l'istanza salvata se esiste
+        """
+        # read page if exists
+        query = Page.all()
+        query.filter('facebook_id =', data["id"])
+        page = query.get()
+        if page:
+            return page
+            
+        # create new page
         page = Page(name = data["name"], facebook_id = data["id"])
         if "category" in data:
             page.category = data["category"]
         if "picture" in data:
             page.picture_url = data["picture"]
+        page.put()
         return page
     
     # nuova istanza di un luogo dai dati di fb

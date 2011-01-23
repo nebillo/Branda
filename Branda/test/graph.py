@@ -1,6 +1,7 @@
 import unittest
 from model.graph import *
 from libs import iso8601
+import logging
 
 
 class GraphTests(unittest.TestCase):
@@ -120,6 +121,9 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(page.name, "sabato sera teenager")
         self.assertEqual(page.category, "other")
         self.assertEqual(page.picture_url, "http://saturday/teen.jpg")
+        
+        same_page = updater.pageFromData(data)
+        self.assertEqual(page.key(), same_page.key())
         
     def test_place_from_data(self):
         user = User(facebook_id = "fake", facebook_access_token = "fake")
