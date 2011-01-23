@@ -337,6 +337,7 @@ class GraphUpdater:
         self.user.put()
         
         # aggiorno media eta'
+        venue.updateTargetAgeWithUser(self.user)
         
         return venues
     

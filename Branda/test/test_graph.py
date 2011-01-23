@@ -222,6 +222,9 @@ class GraphTests(unittest.TestCase):
         
     def test_add_venue_to_user_list(self):
         user = User(facebook_id = "fake", facebook_access_token = "fake")
+        today = datetime.date.today()
+        years = datetime.timedelta(days = 365 * 23)
+        user.birthday = today - years
         user.put()
         
         place = Place(name = "casa di luca", facebook_id = "xxx", location = db.GeoPt(12.22, 24.44))
@@ -231,8 +234,11 @@ class GraphTests(unittest.TestCase):
         venues = updater.addVenueToUserList(place)
         self.assertTrue(isinstance(venues, list))
         self.assertTrue(place.key() in venues)
+        self.assertEqual(place.people, 1)
+        self.assertEqual(round(place.target_age), 23)
         
         same_venues = updater.addVenueToUserList(place)
         self.assertEqual(len(same_venues), len(venues))
+        self.assertEqual(place.people, 1, "ignoring same user")
         
     
