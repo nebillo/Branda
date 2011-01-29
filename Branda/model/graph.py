@@ -84,7 +84,7 @@ class GraphUpdater:
                     if thing in venue_things_unitl_now:
                         continue
                     # incremento legame con $utente
-                    self.increaseUserLinkingWithThing(self.user, thing)
+                    self.increaseUserLinkingWithThing(thing)
                     ## coppie_utente += utente-pagina
         
         # coppie = []
@@ -283,25 +283,37 @@ class GraphUpdater:
         return address
     
     
-    def connectUserToThing(self, thing, increment = 1):
+    def increaseUserLinkingWithThing(self, thing, increment = 1):
         """
-        crea un legame tra user e thing
-        o incrementa il legame se esiste
+        incrementa un legame esistente tra utente e una cosa
         """
         query = UserLinking.all()
         query.filter('user =', self.user)
         query.filter('thing =', thing)
         linking = query.get()
         
-        if linking:
-            # cosa gia' connessa
-            linking.count += increment
-        else:
-            # cosa non connessa
+        if not linking:
+            # il legame non esiste
+            return None
+            
+        linking.count += increment
+        linking.put()
+        return linking
+    
+    
+    def connectUserToThing(self, thing, increment = 1):
+        """
+        crea un legame tra user e thing
+        o incrementa il legame se esiste
+        """
+        linking = self.increaseUserLinkingWithThing(thing, increment)
+        
+        if not linking:
+            # il legame non esiste
             # connetto
             linking = UserLinking(user = self.user, thing = thing, count = increment)
+            linking.put()
             
-        linking.put()
         return linking
     
     
@@ -362,10 +374,6 @@ class GraphUpdater:
             
         linking.put()
         return linking
-    
-    
-    def increaseUserLinkingWithThing(self, user, thing):
-        return
     
     
     def users_linked_to_thing(self, thing):
