@@ -181,8 +181,8 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(event.venue_name, "casa de luca")
         self.assertEqual(event.country, "it")
         self.assertEqual(event.address, "street, city, zip, state")
-        self.assertEqual(event.startTime().strftime("%H:%M"), "22:30")
-        self.assertEqual(event.endTime().strftime("%H:%M"), "04:30")
+        self.assertEqual(event.startTime.strftime("%H:%M"), "22:30")
+        self.assertEqual(event.endTime.strftime("%H:%M"), "04:30")
         
         same_event = updater.eventFromData(data)
         self.assertEqual(event.key(), same_event.key())
