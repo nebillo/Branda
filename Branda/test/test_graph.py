@@ -263,4 +263,30 @@ class GraphTests(unittest.TestCase):
         active_linking = updater.connectVenueToThing(place, page)
         self.assertTrue(active_linking.is_active)
         
-    
+    def test_venue_active_things(self):
+        user = User(facebook_id = "fake", facebook_access_token = "fake")
+        user.put()
+        
+        place = Place(name = "casa di luca", facebook_id = "xxx", location = db.GeoPt(12.22, 24.44))
+        place.put()
+        
+        page = Page(name = "ci piace luca", facebook_id = "xxx")
+        page.put()
+        
+        updater = GraphUpdater(user)
+        
+        linking = updater.connectVenueToThing(venue = place, thing = page)
+        things = updater.getVenueActiveThings(place)
+        self.assertTrue(isinstance(things, list))
+        self.assertEqual(len(things), 0)
+        
+        linking.is_active = True
+        linking.put()
+        things = updater.getVenueActiveThings(place)
+        self.assertEqual(len(things), 1)
+        self.assertTrue(page.key() in things)
+        
+        future = datetime.datetime.now() + datetime.timedelta(days = 3)
+        things = updater.getVenueActiveThings(venue = place, since_date = future, days = 2)
+        self.assertEqual(len(things), 0)
+        

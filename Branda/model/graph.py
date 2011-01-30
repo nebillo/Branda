@@ -63,9 +63,9 @@ class GraphUpdater:
                 venue = self.addVenueToUserList(self.user, venue)
                 
                 # $cose_utente = cose collegate ad utente fino a quel momento
-                user_things_until_now = self.user.linked_things()
+                user_things_until_now = self.user.things[:]
                 # $cose_venue = cose attive collegate a venue fino a quel momento
-                venue_things_unitl_now = venue.linked_things()
+                venue_things_unitl_now = self.getVenueActiveThings(venue)
                 
                 # per ogni $cosa in $cosa_utente:
                 for thing in user_things_until_now:
@@ -377,6 +377,28 @@ class GraphUpdater:
             
         linking.put()
         return linking
+    
+    
+    def getVenueActiveThings(self, venue, days = None, since_date = None, limit = 10):
+        """
+        retrieve the things linked to the venue
+        with a minimum linking count
+        """
+        # get the date limit
+        if not days:
+            days = VenueLinking.kActiveLinkingMaximumDays
+        if not since_date:
+            since_date = datetime.datetime.now()
+        minimum_date = since_date - datetime.timedelta(days = days)
+    
+        # get the active linkings
+        query = db.GqlQuery('SELECT * FROM VenueLinking WHERE venue = :1 AND updated_at >= :2 AND is_active = :3 order by updated_at, count desc', 
+                            venue.key(), minimum_date, True)
+        linkings = query.fetch(limit)
+    
+        # get the things
+        things = [linking.thing.key() for linking in linkings]
+        return things
     
     
     def users_linked_to_thing(self, thing):
