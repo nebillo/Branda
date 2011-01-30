@@ -47,7 +47,7 @@ class GraphUpdater:
                 # inizilizzo pagina
                 page = self.pageFromData(element)
                 # connetto utente a pagina
-                page = self.connectUserToThing(page, 3)
+                page = self.connectUserToThing(page, UserLinking.kNewLinkingCount)
                 # e aggiungo all'elenco delle cose proprie
                 self.addThingToUserList(page)
                 ## coppie_utente += utente-pagina
@@ -371,6 +371,9 @@ class GraphUpdater:
             # cosa non connessa
             # connetto
             linking = VenueLinking(venue = venue, thing = thing, count = 1)
+        
+        if linking.count >= VenueLinking.kActiveLinkingMinimumCount:
+            linking.is_active = True
             
         linking.put()
         return linking

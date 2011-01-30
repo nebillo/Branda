@@ -254,9 +254,13 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(linking.venue, place)
         self.assertEqual(linking.thing, page)
         self.assertEqual(linking.count, 1)
+        self.assertFalse(linking.is_active)
         
         same_linking = updater.connectVenueToThing(place, page)
         self.assertEqual(linking.key(), same_linking.key())
         self.assertEqual(same_linking.count, 2)
+        
+        active_linking = updater.connectVenueToThing(place, page)
+        self.assertTrue(active_linking.is_active)
         
     
