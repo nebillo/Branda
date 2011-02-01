@@ -62,29 +62,19 @@ class GraphUpdater:
                 # connetto utente a venue ()
                 venue = self.addVenueToUserList(self.user, venue)
                 
-                # $cose_utente = cose collegate ad utente fino a quel momento
+                # active things connected to user until now
                 user_things_until_now = self.user.things[:]
-                # $cose_venue = cose attive collegate a venue fino a quel momento
+                # active things connected to venue until now
                 venue_things_unitl_now = self.getVenueActiveThings(venue)
                 
-                # per ogni $cosa in $cosa_utente:
                 for thing in user_things_until_now:
                     # instauro o aumento legame tra venue e cosa
                     self.connectVenueToThing(venue, thing)
                     ## coppie_venue += $venue-$cosa
                 
-                # per ogni $cosa in $cose_venue:
                 for thing in venue_things_unitl_now:
                     # instauro o aumento legame tra utente e cosa
                     self.connectUserToThing(thing)
-                    ## coppie_utente += utente-pagina
-                    
-                # per ogni $cosa in $cose_utente non in $cose_venue:
-                for thing in user_things_until_now:
-                    if thing in venue_things_unitl_now:
-                        continue
-                    # incremento legame con $utente
-                    self.increaseUserLinkingWithThing(thing)
                     ## coppie_utente += utente-pagina
         
         # coppie = []
