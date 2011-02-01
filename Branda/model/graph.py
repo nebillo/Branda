@@ -47,7 +47,7 @@ class GraphUpdater:
                 # inizilizzo pagina
                 page = self.pageFromData(element)
                 # connetto utente a pagina
-                page = self.connectUserToThing(page, UserLinking.kNewLinkingCount)
+                page = self.connectUserToThing(page, UserLinking.kActiveLinkingMinimumCount)
                 # e aggiungo all'elenco delle cose proprie
                 self.addThingToUserList(page)
                 ## coppie_utente += utente-pagina
@@ -273,37 +273,25 @@ class GraphUpdater:
         return address
     
     
-    def increaseUserLinkingWithThing(self, thing, increment = 1):
+    def connectUserToThing(self, thing, increment = 1):
         """
-        incrementa un legame esistente tra utente e una cosa
+        crea un legame tra user e thing
+        o incrementa il legame se esiste
         """
         query = UserLinking.all()
         query.filter('user =', self.user)
         query.filter('thing =', thing)
         linking = query.get()
         
-        if not linking:
-            # il legame non esiste
-            return None
-            
-        linking.count += increment
-        linking.put()
-        return linking
-    
-    
-    def connectUserToThing(self, thing, increment = 1):
-        """
-        crea un legame tra user e thing
-        o incrementa il legame se esiste
-        """
-        linking = self.increaseUserLinkingWithThing(thing, increment)
-        
-        if not linking:
-            # il legame non esiste
-            # connetto
+        if linking:
+            linking.count += increment
+        else:
             linking = UserLinking(user = self.user, thing = thing, count = increment)
-            linking.put()
             
+        if linking.count >= UserLinking.kActiveLinkingMinimumCount:
+            linking.is_active = True
+        
+        linking.put()
         return linking
     
     

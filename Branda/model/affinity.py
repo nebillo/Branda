@@ -9,11 +9,12 @@ from thing import Thing
 
 class UserLinking(db.Model):
     
-    kNewLinkingCount = 3
+    kActiveLinkingMinimumCount = 3
     
     user = db.ReferenceProperty(User, required = True, collection_name = 'linkings')
     thing = db.ReferenceProperty(Thing, required = True, collection_name = 'linkings_with_user')
-    count = db.IntegerProperty(required = True, default = kNewLinkingCount)
+    count = db.IntegerProperty(required = True, default = 1)
+    is_active = db.BooleanProperty(required = True, default = False)
     created_at = db.DateTimeProperty(required = True, auto_now_add = True)
     updated_at = db.DateTimeProperty(required = True, auto_now = True)  
 
