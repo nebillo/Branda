@@ -10,6 +10,7 @@ from thing import Thing
 class UserLinking(db.Model):
     
     kActiveLinkingMinimumCount = 3
+    kActiveLinkingMaximumDays = 120
     
     user = db.ReferenceProperty(User, required = True, collection_name = 'linkings')
     thing = db.ReferenceProperty(Thing, required = True, collection_name = 'linkings_with_user')
