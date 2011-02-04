@@ -1,0 +1,7 @@
+Handler Base
+========================
+
+Documentation for base.py
+
+.. py:function:: get_facebook_cookie(self)
+    Prova di scrittura

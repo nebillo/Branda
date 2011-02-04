@@ -1,0 +1,4 @@
+Handler Auth
+========================
+
+.. automodule:
