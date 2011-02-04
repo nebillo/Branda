@@ -1,3 +1,13 @@
+"""
+.. module:: Graph Handler
+   :platform: Tornado Web Framework
+   :synopsis: Graph Handler
+
+.. moduleauthor:: Branda Developing Team <dev@branda.something>
+
+
+"""
+
 from base import *
 from libs.facebook import *
 from tornado.escape import *
@@ -20,6 +30,19 @@ class GraphHandler(BaseHandler):
 class GraphDataHandler(BaseHandler):
     
     def getFacebookData(self, key, default = None):
+        """Get Facebok Data. Decode Json and return data
+              :param name: self.
+              :type name: self.
+              :param state: Current state to be in.
+              :type state: Self Object.
+              :param name: key.
+              :type name: key.
+              :param state: not null.
+              :type state: boh.
+              :returns:  data.
+              :raises: Nothing
+        """
+        
         string = self.get_argument(key)
         if not string:
             return default
@@ -30,9 +53,19 @@ class GraphDataHandler(BaseHandler):
             
         return data
         
-    # update user data
     @tornado.web.authenticated
     def post(self):
+      
+        """Get data from Facebook and update user graph. It sets date of expiration data.
+
+          :param name: self.
+          :type name: self.
+          :param state: Current state to be in.
+          :type state: Self Object.
+          :returns:  data.
+          :raises: HTTPError(400).
+
+        """
         user = self.get_current_user()
         
         # read parameters
@@ -61,6 +94,17 @@ class GraphDataHandler(BaseHandler):
     # get graph data  
     @tornado.web.authenticated
     def get(self):
+      
+        """Geolocate the user and fetch data from graph?.
+
+            :param name: self.
+            :type name: self.
+            :param state: Current state to be in.
+            :type state: Self Object.
+            :returns:  data.
+            :raises: HTTPError(400).
+
+        """
         user = self.get_current_user()
         
         # read parameters

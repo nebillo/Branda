@@ -1,18 +1,46 @@
+"""
+.. module:: Auth Handler
+   :platform: Tornado Web Framework
+   :synopsis: Auth Handler
+
+.. moduleauthor:: Branda Developing Team <dev@branda.something>
+"""
+
 from base import *
 
 
 class LoginHandler(BaseHandler):
     def get(self):
+      
+        """Get Method : Renders login.html page.
+        """
         self.render("login.html", options = options, title = "Login")
 
 class LogoutHandler(BaseHandler):
+  
     def get(self):
-        #remove cookies
+      
+        """User Logout. Clear all cookies and redirect to root.
+
+        :param name: self.
+        :type name: self.
+        """
         self.clear_all_cookies()
         self.redirect("/")
 
 class AuthHandler(BaseHandler):
     def get(self):
+      
+        """Check if the facebook cookie is in and connect user with facebook login. if not raise error 401. 
+
+        :param name: self.
+        :type name: self.
+        :param state: Current state to be in.
+        :type state: bool.
+        :returns: Void
+        :raises: tornado.web.HTTPError(401)
+
+        """
         fb_cookie = self.get_facebook_cookie()
         if not fb_cookie:
             raise tornado.web.HTTPError(401)

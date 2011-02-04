@@ -3,5 +3,13 @@ from base import *
 
 class MainHandler(BaseHandler):
     def get(self):
-        # now index is empty, redirect to graph
+        """Main Handler. Index is empty and redirect to graph
+
+          :param name: self.
+          :type name: self.
+          :param state: Current state to be in.
+          :type state: Self Object.
+          :returns:  Void.
+          :raises: Nothing
+        """
         self.redirect("/graph")
