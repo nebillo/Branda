@@ -314,3 +314,52 @@ class GraphTests(unittest.TestCase):
         things = updater.getVenueActiveThings(venue = place, since_date = future, days = 2)
         self.assertEqual(len(things), 0)
         
+    def test_update_affinity(self):
+        user = User(facebook_id = "fake", facebook_access_token = "fake")
+        user.put()
+        
+        place = Place(name = "casa di luca", facebook_id = "xxx", location = db.GeoPt(12.22, 24.44))
+        place.put()
+        
+        updater = GraphUpdater(user)
+        
+        
+        # nothing in common
+        thing1 = Page(name = "thing1", facebook_id = "thing1")
+        thing1.put()
+        updater.connectUserToThing(thing1)
+        
+        thing2 = Page(name = "thing2", facebook_id = "thing2")
+        thing2.put()
+        updater.connectVenueToThing(place, thing2)
+        
+        affinity = updater.updateAffinity(user = user, venue = place)
+        self.assertEqual(affinity.value, 0)
+        
+        # one thing in common with same count
+        user_linking_2 = updater.connectUserToThing(thing2)
+        
+        affinity = updater.updateAffinity(user = user, venue = place)
+        self.assertEqual(affinity.value, 1)
+        
+        # two things in common with the same count
+        venue_linking_1 = updater.connectVenueToThing(place, thing1)
+        
+        affinity = updater.updateAffinity(user = user, venue = place)
+        self.assertEqual(affinity.value, 2)
+        
+        # two things in common, one good and one bad
+        user_linking_2.count = -1
+        user_linking_2.put()
+        
+        affinity = updater.updateAffinity(user = user, venue = place)
+        self.assertEqual(affinity.value, 0)
+        
+        # two things in common, both bad
+        venue_linking_1.count = -1
+        venue_linking_1.put()
+        
+        affinity = updater.updateAffinity(user = user, venue = place)
+        self.assertEqual(affinity.value, -2)
+        
+        

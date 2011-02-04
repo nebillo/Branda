@@ -1,5 +1,6 @@
 import datetime
 import logging
+import math
 
 from libs import iso8601
 from google.appengine.ext import db
@@ -7,7 +8,7 @@ from google.appengine.ext import db
 from user import User
 from thing import Thing, Page
 from venue import Venue, Place, Event
-from affinity import UserLinking, VenueLinking
+from affinity import UserLinking, VenueLinking, Affinity
 
 
 # update the graph nodes with the facebook user data
@@ -59,6 +60,7 @@ class GraphUpdater:
                     venue = self.placeFromData(element)
                 else:
                     venue = self.eventFromData(element)
+                    # se questo evento e' gia' associato all'utente devo evitare di rielaborlo
                 # connetto utente a venue ()
                 venue = self.addVenueToUserList(self.user, venue)
                 
@@ -408,6 +410,44 @@ class GraphUpdater:
     def venues_linked_to_thing(self, thing):
         return []
     
+    
+    def updateAffinity(self, user, venue):
+        """
+        update affinity from user and venue
+        based on linked things in common
+        """
+        # get user-thing's linkings
+        user_linkings = user.linkings.fetch(99999)
+        # get venue-thing's linkings
+        venue_linkings = venue.linkings.fetch(99999)
+        
+        affinity_value = 0.0
+        for u_linking in user_linkings:
+            # search u_linking.thing in each venue_linking.thing
+            for v_linking in venue_linkings:
+                if u_linking.thing.key() == v_linking.thing.key():
+                    affinity_value += self.calculateAffinity(u_linking.count, v_linking.count)
+                    venue_linkings.remove(v_linking)
+                    break
+                
+        
+        # search for existing affinity between user and venue
+        query = Affinity.all()
+        query.filter('user =', user)
+        query.filter('venue =', venue)
+        affinity = query.get()
+        if not affinity:
+            affinity = Affinity(user = user, venue = venue)
+            
+        # save affinity
+        affinity.value = affinity_value
+        affinity.put()
+        return affinity
+    
+    
+    def calculateAffinity(self, count_a, count_b):
+        return - math.fabs(count_a - count_b) / max(math.fabs(count_a), math.fabs(count_b)) + 1
+        
 
 # read the graph data suggested for a user
 class GraphReader:

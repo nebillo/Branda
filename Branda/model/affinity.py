@@ -36,6 +36,6 @@ class VenueLinking(db.Model):
 class Affinity(db.Model):
     user = db.ReferenceProperty(User, required = True, collection_name = 'affinities')
     venue = db.ReferenceProperty(Venue, required = True, collection_name = 'affinities')
-    affinity = db.FloatProperty(required = True, default = 0)
+    value = db.FloatProperty(required = True, default = 0.0)
     created_at = db.DateTimeProperty(required = True, auto_now_add = True)
     updated_at = db.DateTimeProperty(required = True, auto_now = True)
