@@ -181,8 +181,8 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(event.venue_name, "casa de luca")
         self.assertEqual(event.country, "it")
         self.assertEqual(event.address, "street, city, zip, state")
-        self.assertEqual(event.startTime().strftime("%H:%M"), "22:30")
-        self.assertEqual(event.endTime().strftime("%H:%M"), "04:30")
+        self.assertEqual(event.startTime.strftime("%H:%M"), "22:30")
+        self.assertEqual(event.endTime.strftime("%H:%M"), "04:30")
         
         same_event = updater.eventFromData(data)
         self.assertEqual(event.key(), same_event.key())
@@ -254,9 +254,63 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(linking.venue, place)
         self.assertEqual(linking.thing, page)
         self.assertEqual(linking.count, 1)
+        self.assertFalse(linking.is_active)
         
         same_linking = updater.connectVenueToThing(place, page)
         self.assertEqual(linking.key(), same_linking.key())
         self.assertEqual(same_linking.count, 2)
         
-    
+        active_linking = updater.connectVenueToThing(place, page)
+        self.assertTrue(active_linking.is_active)
+        
+    def test_user_active_things(self):
+        user = User(facebook_id = "fake", facebook_access_token = "fake")
+        user.put()
+        
+        page = Page(name = "ci piace luca", facebook_id = "xxx")
+        page.put()
+        
+        updater = GraphUpdater(user)
+        
+        linking = updater.connectUserToThing(thing = page)
+        things = updater.getUserActiveThings()
+        self.assertTrue(isinstance(things, list))
+        self.assertEqual(len(things), 0)
+        
+        linking.is_active = True
+        linking.put()
+        things = updater.getUserActiveThings()
+        self.assertEqual(len(things), 1)
+        self.assertTrue(page.key() in things)
+        
+        future = datetime.datetime.now() + datetime.timedelta(days = 3)
+        things = updater.getUserActiveThings(since_date = future, days = 2)
+        self.assertEqual(len(things), 0)
+        
+    def test_venue_active_things(self):
+        user = User(facebook_id = "fake", facebook_access_token = "fake")
+        user.put()
+        
+        place = Place(name = "casa di luca", facebook_id = "xxx", location = db.GeoPt(12.22, 24.44))
+        place.put()
+        
+        page = Page(name = "ci piace luca", facebook_id = "xxx")
+        page.put()
+        
+        updater = GraphUpdater(user)
+        
+        linking = updater.connectVenueToThing(venue = place, thing = page)
+        things = updater.getVenueActiveThings(place)
+        self.assertTrue(isinstance(things, list))
+        self.assertEqual(len(things), 0)
+        
+        linking.is_active = True
+        linking.put()
+        things = updater.getVenueActiveThings(place)
+        self.assertEqual(len(things), 1)
+        self.assertTrue(page.key() in things)
+        
+        future = datetime.datetime.now() + datetime.timedelta(days = 3)
+        things = updater.getVenueActiveThings(venue = place, since_date = future, days = 2)
+        self.assertEqual(len(things), 0)
+        

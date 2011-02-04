@@ -46,12 +46,15 @@ class Event(Venue):
     country = db.StringProperty()
     
     
-    def startTime(self):
+    def getStartTime(self):
         if len(self.period) > 0:
             return self.period[0]
         return None
     
-    def endTime(self):
+    def getEndTime(self):
         if len(self.period) > 1:
             return self.period[1]
         return self.startTime()
+        
+    startTime = property(getStartTime)
+    endTime = property(getEndTime)

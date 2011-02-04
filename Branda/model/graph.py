@@ -47,7 +47,7 @@ class GraphUpdater:
                 # inizilizzo pagina
                 page = self.pageFromData(element)
                 # connetto utente a pagina
-                page = self.connectUserToThing(page, 3)
+                page = self.connectUserToThing(page, UserLinking.kActiveLinkingMinimumCount)
                 # e aggiungo all'elenco delle cose proprie
                 self.addThingToUserList(page)
                 ## coppie_utente += utente-pagina
@@ -62,29 +62,19 @@ class GraphUpdater:
                 # connetto utente a venue ()
                 venue = self.addVenueToUserList(self.user, venue)
                 
-                # $cose_utente = cose collegate ad utente fino a quel momento
-                user_things_until_now = self.user.linked_things()
-                # $cose_venue = cose attive collegate a venue fino a quel momento
-                venue_things_unitl_now = venue.linked_things()
+                # active things connected to user until now
+                user_things_until_now = self.getUserActiveThings()
+                # active things connected to venue until now
+                venue_things_unitl_now = self.getVenueActiveThings(venue)
                 
-                # per ogni $cosa in $cosa_utente:
                 for thing in user_things_until_now:
                     # instauro o aumento legame tra venue e cosa
                     self.connectVenueToThing(venue, thing)
                     ## coppie_venue += $venue-$cosa
                 
-                # per ogni $cosa in $cose_venue:
                 for thing in venue_things_unitl_now:
                     # instauro o aumento legame tra utente e cosa
                     self.connectUserToThing(thing)
-                    ## coppie_utente += utente-pagina
-                    
-                # per ogni $cosa in $cose_utente non in $cose_venue:
-                for thing in user_things_until_now:
-                    if thing in venue_things_unitl_now:
-                        continue
-                    # incremento legame con $utente
-                    self.increaseUserLinkingWithThing(self.user, thing)
                     ## coppie_utente += utente-pagina
         
         # coppie = []
@@ -294,13 +284,13 @@ class GraphUpdater:
         linking = query.get()
         
         if linking:
-            # cosa gia' connessa
             linking.count += increment
         else:
-            # cosa non connessa
-            # connetto
             linking = UserLinking(user = self.user, thing = thing, count = increment)
             
+        if linking.count >= UserLinking.kActiveLinkingMinimumCount:
+            linking.is_active = True
+        
         linking.put()
         return linking
     
@@ -359,13 +349,56 @@ class GraphUpdater:
             # cosa non connessa
             # connetto
             linking = VenueLinking(venue = venue, thing = thing, count = 1)
+        
+        if linking.count >= VenueLinking.kActiveLinkingMinimumCount:
+            linking.is_active = True
             
         linking.put()
         return linking
     
     
-    def increaseUserLinkingWithThing(self, user, thing):
-        return
+    def getUserActiveThings(self, days = None, since_date = None, limit = 10):
+        """
+        retrieve the active things linked to the user
+        not older than a minimum period
+        """
+        # get the date limit
+        if not days:
+            days = UserLinking.kActiveLinkingMaximumDays
+        if not since_date:
+            since_date = datetime.datetime.now()
+        minimum_date = since_date - datetime.timedelta(days = days)
+    
+        # get the active linkings
+        query = db.GqlQuery('SELECT * FROM UserLinking WHERE user = :1 AND updated_at >= :2 AND is_active = :3 order by updated_at, count desc', 
+                            self.user.key(), minimum_date, True)
+        linkings = query.fetch(limit)
+    
+        # get the things
+        things = [linking.thing.key() for linking in linkings]
+        return things
+    
+    
+    def getVenueActiveThings(self, venue, days = None, since_date = None, limit = 10):
+        """
+        retrieve the things linked to the venue
+        with a minimum linking count
+        """
+        # get the date limit
+        if not days:
+            days = VenueLinking.kActiveLinkingMaximumDays
+        if not since_date:
+            since_date = datetime.datetime.now()
+        minimum_date = since_date - datetime.timedelta(days = days)
+    
+        # get the active linkings
+        query = db.GqlQuery('SELECT * FROM VenueLinking WHERE venue = :1 AND updated_at >= :2 AND is_active = :3 order by updated_at, count desc', 
+                            venue.key(), minimum_date, True)
+        linkings = query.fetch(limit)
+    
+        # get the things
+        things = [linking.thing.key() for linking in linkings]
+        return things
     
     
     def users_linked_to_thing(self, thing):
