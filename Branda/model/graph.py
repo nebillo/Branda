@@ -25,10 +25,8 @@ class GraphUpdater:
     # update data and return whether nodes have been updated
     def updateNodes(self, info, likes, events, places):
         
-        # coppie_venue = []
-        venues_linkings = []
-        # coppie_utente = []
-        user_linkings = []
+        updated_venue_linkings = []
+        updated_user_linkings = []
         
         # aggiorno le info utente non indicizzate
         self.updateUserBasicInfo(info)
@@ -51,7 +49,11 @@ class GraphUpdater:
                 page = self.connectUserToThing(page, UserLinking.kActiveLinkingMinimumCount)
                 # e aggiungo all'elenco delle cose proprie
                 self.addThingToUserList(page)
+                
                 ## coppie_utente += utente-pagina
+                couple = (page.key(), self.user.key())
+                if not couple in updated_user_linkings:
+                    updated_user_linkings.append(couple)
             
             # venue:
             if element.type == GraphUpdater.kPlaceType or element.type == GraphUpdater.kEventType:
@@ -73,35 +75,45 @@ class GraphUpdater:
                     # instauro o aumento legame tra venue e cosa
                     self.connectVenueToThing(venue, thing)
                     ## coppie_venue += $venue-$cosa
+                    couple = (thing, venue.key())
+                    if not couple in updated_venue_linkings:
+                        updated_venue_linkings.append(couple)
                 
                 for thing in venue_things_unitl_now:
                     # instauro o aumento legame tra utente e cosa
                     self.connectUserToThing(thing)
                     ## coppie_utente += utente-pagina
+                    couple = (thing, self.user.key())
+                    if not couple in updated_user_linkings:
+                        updated_user_linkings.append(couple)
         
-        # coppie = []
         affinities = []
         
-        # per ogni coppia in coppie_venue:
-        for venue_thing in venues_linkings:
-            users = self.users_linked_to_thing(venue_thing.thing())
+        for updated_couple in updated_venue_linkings:
+            users = self.users_linked_to_thing(updated_couple[0])
             # per ogni utente collegato a coppia.cosa:
             for user in users:
                 # coppie += coppia.venue-utente
-                continue
+                couple = (user, updated_couple[1])
+                if not couple in affinities:
+                    affinities.append(couple)
             
         # per ogni coppia in coppie_utente:
-        for thing in user_linkings:
-            venues = self.venues_linked_to_thing(thing)
+        for updated_couple in updated_user_linkings:
+            venues = self.venues_linked_to_thing(updated_couple[0])
             # per ogni venue collegato a coppia.cosa:
             for venue in venues:
                 # coppie += coppia.utente-venue
-                continue
+                couple = (updated_couple[1], venue)
+                if not couple in affinities:
+                    affinities.append(couple)
         
         # per ogni coppia in coppie:
         for affinity in affinities:
             # aggiorno affinita' tra coppia.venue e coppia.utente
-            continue
+            user = db.get(affinity[0])
+            venue = db.get(affinity[1])
+            self.updateAffinity(user = user, venue = venue)
                 
         return len(affinities) > 0
         
@@ -404,11 +416,21 @@ class GraphUpdater:
     
     
     def users_linked_to_thing(self, thing):
-        return []
+        query = UserLinking.all()
+        query.filter('thing =', thing)
+        linkings = query.fetch(query.count())
+        
+        users = [linking.user.key() for linking in linkings]
+        return users
     
     
     def venues_linked_to_thing(self, thing):
-        return []
+        query = VenueLinking.all()
+        query.filter('thing =', thing)
+        linkings = query.fetch(query.count())
+        
+        venues = [linking.venue.key() for linking in linkings]
+        return venues
     
     
     def updateAffinity(self, user, venue):
