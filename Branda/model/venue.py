@@ -41,7 +41,7 @@ class Event(Venue):
     picture_url = db.LinkProperty()
     period = db.ListProperty(datetime.datetime)
     
-    venue_name = db.StringProperty(required = True)
+    venue_name = db.StringProperty()
     address = db.PostalAddressProperty()
     country = db.StringProperty()
     

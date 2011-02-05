@@ -265,12 +265,19 @@ class GraphUpdater:
             return event
             
         # create new event
+        if not "venue" in data:
+            return None
         venue = data["venue"]
+        
+        if not "latitude" in venue or not "longitude" in venue:
+            return None
         coordinate = db.GeoPt(venue["latitude"], venue["longitude"])
         
-        event = Event(facebook_id = data["id"], location = coordinate, name = data["name"], venue_name = data["location"])
-        
-        event.country = venue["country"]
+        event = Event(facebook_id = data["id"], location = coordinate, name = data["name"])
+        if "location" in venue:
+            event.venue_name = data["location"]
+        if "country" in venue:
+            event.country = venue["country"]
         event.address = self.postalAddressFromVenueData(venue)
         
         event.period = [iso8601.parse_date(data["start_time"]), iso8601.parse_date(data["end_time"])]
