@@ -131,6 +131,9 @@ class GraphUpdater:
         
         
     def updateUserBasicInfo(self, info):
+        """
+        update user basic info
+        """
         if "first_name" in info:
             self.user.first_name = info["first_name"]
         if "last_name" in info:
@@ -147,7 +150,9 @@ class GraphUpdater:
             birthday = info["birthday"]
             birthday = datetime.datetime.strptime(birthday, "%m/%d/%Y")
             self.user.birthday = birthday.date()
-        return
+        user.put()
+        return user
+        
     
     def updateReligionFromData(self, user, info):
         # imposto legame con vecchia info a zero
