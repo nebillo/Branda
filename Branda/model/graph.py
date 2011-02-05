@@ -48,16 +48,15 @@ class GraphUpdater:
             if element["type"] == GraphUpdater.kPageType:
                 # inizilizzo pagina
                 page = self.pageFromData(element)
-                logging.info("\t+adding thing to user: %s", page.name)
                 
                 # skip if user already owns the thing
                 if self.isThingInUserList(page):
                     continue
                     
-                # connetto utente a pagina
-                page = self.connectUserToThing(page, UserLinking.kActiveLinkingMinimumCount)
-                # e aggiungo all'elenco delle cose proprie
+                logging.info("\t+ adding thing to user: %s", page.name)
                 self.addThingToUserList(page)
+                # connetto utente a pagina
+                self.connectUserToThing(page, UserLinking.kActiveLinkingMinimumCount)
                 
                 ## coppie_utente += utente-pagina
                 couple = (page.key(), self.user.key())
@@ -69,17 +68,16 @@ class GraphUpdater:
                 # inizializzo venue
                 if element["type"] == GraphUpdater.kPlaceType:
                     venue = self.placeFromData(element)
-                    logging.info("\t+adding place to user: %s", venue.name)
                 else:
                     venue = self.eventFromData(element)
                     if not venue:
                         continue
-                    logging.info("\t+adding event to user: %s", venue.name)
                 
                 # skip if user already owns the venue
                 if self.isVenueInUserList(venue):
                     continue
                     
+                logging.info("\t+ adding venue (%s) to user: %s", element["type"], venue.name)
                 # connetto utente a venue ()
                 self.addVenueToUserList(venue)
                 
@@ -159,8 +157,9 @@ class GraphUpdater:
             birthday = info["birthday"]
             birthday = datetime.datetime.strptime(birthday, "%m/%d/%Y")
             self.user.birthday = birthday.date()
-        user.put()
-        return user
+        
+        self.user.put()
+        return self.user
         
     
     def updateReligionFromData(self, user, info):
@@ -288,7 +287,7 @@ class GraphUpdater:
         coordinate = db.GeoPt(venue["latitude"], venue["longitude"])
         
         event = Event(facebook_id = data["id"], location = coordinate, name = data["name"])
-        if "location" in venue:
+        if "location" in data:
             event.venue_name = data["location"]
         if "country" in venue:
             event.country = venue["country"]
