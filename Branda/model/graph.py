@@ -49,6 +49,11 @@ class GraphUpdater:
                 # inizilizzo pagina
                 page = self.pageFromData(element)
                 logging.info("\t+adding thing to user: %s", page.name)
+                
+                # skip if user already owns the thing
+                if self.isThingInUserList(page):
+                    continue
+                    
                 # connetto utente a pagina
                 page = self.connectUserToThing(page, UserLinking.kActiveLinkingMinimumCount)
                 # e aggiungo all'elenco delle cose proprie
@@ -70,7 +75,11 @@ class GraphUpdater:
                     if not venue:
                         continue
                     logging.info("\t+adding event to user: %s", venue.name)
-                    # se questo evento e' gia' associato all'utente devo evitare di rielaborlo
+                
+                # skip if user already owns the venue
+                if self.isVenueInUserList(venue):
+                    continue
+                    
                 # connetto utente a venue ()
                 self.addVenueToUserList(venue)
                 
@@ -340,6 +349,13 @@ class GraphUpdater:
         return linking
     
     
+    def isThingInUserList(self, thing):
+        """
+        check if user things list contains a particular thing
+        """
+        return thing.key() in self.user.things
+    
+    
     def addThingToUserList(self, thing):
         """
         thing viene aggiunta alle cose dell'utente
@@ -354,6 +370,13 @@ class GraphUpdater:
         things.append(thing.key())
         self.user.put()
         return things
+    
+    
+    def isVenueInUserList(self, venue):
+        """
+        check if user venues list contains a particular venue
+        """
+        return venue.key() in self.user.venues
     
     
     def addVenueToUserList(self, venue):
