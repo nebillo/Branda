@@ -30,21 +30,25 @@ class GraphUpdater:
         
         # aggiorno le info utente non indicizzate
         self.updateUserBasicInfo(info)
+        logging.info("user basic info updated")
         
         # aggiorno le info indicizzate
         self.updateReligionFromData(self.user, info)
         self.updatePoliticalFromData(self.user, info)
+        logging.info("user indexed info updated")
         
         # lista = merge degli eventi, pagine e posti
         # metto la lista in ordine cronologico
         stream = self.getStreamByMergingData(likes, events, places)
+        logging.info("stream is composed by %d things", len(stream))
         
         # scorro ogni elemento della lista
         for element in stream:
             # pagina:
-            if element.type == GraphUpdater.kPageType:
+            if element["type"] == GraphUpdater.kPageType:
                 # inizilizzo pagina
                 page = self.pageFromData(element)
+                logging.info("\t+adding thing to user: %s", page.name)
                 # connetto utente a pagina
                 page = self.connectUserToThing(page, UserLinking.kActiveLinkingMinimumCount)
                 # e aggiungo all'elenco delle cose proprie
@@ -56,21 +60,26 @@ class GraphUpdater:
                     updated_user_linkings.append(couple)
             
             # venue:
-            if element.type == GraphUpdater.kPlaceType or element.type == GraphUpdater.kEventType:
+            if element["type"] == GraphUpdater.kPlaceType or element["type"] == GraphUpdater.kEventType:
                 # inizializzo venue
-                if element.type == GraphUpdater.kPlaceType:
+                if element["type"] == GraphUpdater.kPlaceType:
                     venue = self.placeFromData(element)
+                    logging.info("\t+adding place to user: %s", venue.name)
                 else:
                     venue = self.eventFromData(element)
+                    if not venue:
+                        continue
+                    logging.info("\t+adding event to user: %s", venue.name)
                     # se questo evento e' gia' associato all'utente devo evitare di rielaborlo
                 # connetto utente a venue ()
-                venue = self.addVenueToUserList(self.user, venue)
+                self.addVenueToUserList(venue)
                 
                 # active things connected to user until now
                 user_things_until_now = self.getUserActiveThings()
                 # active things connected to venue until now
-                venue_things_unitl_now = self.getVenueActiveThings(venue)
+                venue_things_until_now = self.getVenueActiveThings(venue)
                 
+                logging.info("\tstart connecting venue to %d user active things", len(user_things_until_now))
                 for thing in user_things_until_now:
                     # instauro o aumento legame tra venue e cosa
                     self.connectVenueToThing(venue, thing)
@@ -79,7 +88,8 @@ class GraphUpdater:
                     if not couple in updated_venue_linkings:
                         updated_venue_linkings.append(couple)
                 
-                for thing in venue_things_unitl_now:
+                logging.info("\tstart connecting user to %d venue active things", len(venue_things_until_now))
+                for thing in venue_things_until_now:
                     # instauro o aumento legame tra utente e cosa
                     self.connectUserToThing(thing)
                     ## coppie_utente += utente-pagina
@@ -89,6 +99,7 @@ class GraphUpdater:
         
         affinities = []
         
+        logging.info("finding users in common with %d venue updated linkings", len(updated_venue_linkings))
         for updated_couple in updated_venue_linkings:
             users = self.users_linked_to_thing(updated_couple[0])
             # per ogni utente collegato a coppia.cosa:
@@ -98,7 +109,7 @@ class GraphUpdater:
                 if not couple in affinities:
                     affinities.append(couple)
             
-        # per ogni coppia in coppie_utente:
+        logging.info("finding venes in common with %d user updated linkings", len(updated_user_linkings))
         for updated_couple in updated_user_linkings:
             venues = self.venues_linked_to_thing(updated_couple[0])
             # per ogni venue collegato a coppia.cosa:
@@ -108,13 +119,14 @@ class GraphUpdater:
                 if not couple in affinities:
                     affinities.append(couple)
         
-        # per ogni coppia in coppie:
+        logging.info("updating affinities for %d couples", len(affinities))
         for affinity in affinities:
             # aggiorno affinita' tra coppia.venue e coppia.utente
             user = db.get(affinity[0])
             venue = db.get(affinity[1])
             self.updateAffinity(user = user, venue = venue)
-                
+        
+        logging.info("update finished: %d", len(affinities) > 0)
         return len(affinities) > 0
         
         
@@ -155,18 +167,25 @@ class GraphUpdater:
     
     
     def getStreamByMergingData(self, likes, events, places):
-        self.addTypeToObjects(likes, GraphUpdater.kPageType)
-        self.addTypeToObjects(events, GraphUpdater.kEventType)
-        self.addTypeToObjects(places, GraphUpdater.kPlaceType)
+        likes = self.addTypeToObjects(likes, GraphUpdater.kPageType)
+        events = self.addTypeToObjects(events, GraphUpdater.kEventType)
+        places = self.addTypeToObjects(places, GraphUpdater.kPlaceType)
         merge = self.mergeOrderedArrays(likes, "created_time", places, "created_time")
         merge = self.mergeOrderedArrays(merge, "created_time", events, "start_time")
         return merge
     
     
     def addTypeToObjects(self, objects, value):
+        objects_with_type = []
         for obj in objects:
-            obj["type"] = value
+            if not obj:
+                continue
+            obj_with_type = obj
+            obj_with_type["type"] = value
+            objects_with_type.append(obj_with_type)
             
+        return objects_with_type
+        
     
     def mergeOrderedArrays(self, first_list, first_field, second_list, second_field):
         merge = []
