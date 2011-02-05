@@ -12,4 +12,5 @@ class MainHandler(BaseHandler):
           :returns:  Void.
           :raises: Nothing
         """
-        self.redirect("/graph")
+        self.write("home")
+

@@ -19,7 +19,7 @@ def main():
     settings = {
         "debug": True,
         "login_url": "/login",
-        "post_login_url": "/graph",
+        "post_login_url": "/",
         "xsrf_cookies": True,
         "cookie_secret": "32oETzXXAAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
         "template_path": os.path.join(os.path.dirname(__file__), "templates"),
